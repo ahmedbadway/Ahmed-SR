@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { List, X } from '@phosphor-icons/react';
 import { scrollToId } from '../utils/scrollToId.js';
+import { getLenis } from '../utils/lenis.js';
 
 const links = [
   { id: 'about', label: 'About' },
@@ -20,11 +21,16 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Lock body scroll while the mobile sheet is open.
+  // Lock body scroll while the mobile sheet is open. Lenis ignores
+  // overflow:hidden, so pause it explicitly too.
   useEffect(() => {
+    const lenis = getLenis();
     document.body.style.overflow = open ? 'hidden' : '';
+    if (open) lenis?.stop();
+    else lenis?.start();
     return () => {
       document.body.style.overflow = '';
+      getLenis()?.start();
     };
   }, [open]);
 
