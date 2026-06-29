@@ -11,7 +11,7 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/500.css';
 
 import App from './App.jsx';
-import    <script type="module" src="/src/main.jsx"></script>
+import'./styles/index.css';>
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
