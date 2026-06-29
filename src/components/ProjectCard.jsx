@@ -18,7 +18,7 @@ export default function ProjectCard({ project, index }) {
   // the file isn't present yet (added to public/projects/<slug>.jpg).
   const [imgOk, setImgOk] = useState(Boolean(project.image));
   const imgSrc = project.image
-    ? `${import.meta.env.BASE_URL}projects/${project.image}.jpg`
+    ? `${import.meta.env.BASE_URL}projects/${project.image}`
     : null;
 
   return (
