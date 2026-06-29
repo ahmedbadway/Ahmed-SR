@@ -10,7 +10,7 @@ export const projects = [
     tech: ['React', 'Tailwind', 'Framer Motion', 'i18n'],
     url: 'https://ahmedbadway.github.io/omar-berfun/',
     gradient: ['oklch(0.40 0.10 25)', 'oklch(0.16 0.03 30)'],
-    image: 'elo',
+    image: 'elo.jpeg',
   },
   {
     name: 'Amr Ziada Interiors',
@@ -20,7 +20,7 @@ export const projects = [
     tech: ['React', 'Tailwind', 'GSAP'],
     url: 'https://ahmedbadway.github.io/amr-zida/',
     gradient: ['oklch(0.45 0.06 70)', 'oklch(0.17 0.02 60)'],
-    image: 'amr-ziada',
+    image: 'amr-ziada.jpeg',
   },
   {
     name: 'Dr. Ahmed Galal Clinic',
@@ -30,7 +30,7 @@ export const projects = [
     tech: ['React', 'Tailwind', 'Framer Motion'],
     url: 'https://ahmedbadway.github.io/dr-ahmed-gala/',
     gradient: ['oklch(0.46 0.07 200)', 'oklch(0.17 0.03 220)'],
-    image: 'dr-galal',
+    image: 'dr-galal.png',
   },
   {
     name: 'DR. Moghazy',
@@ -40,7 +40,7 @@ export const projects = [
     tech: ['React', 'Tailwind', 'Motion'],
     url: 'https://ahmedbadway.github.io/DR-Moghzy-/',
     gradient: ['oklch(0.44 0.08 160)', 'oklch(0.16 0.03 170)'],
-    image: 'moghazy',
+    image: 'moghazy.jpeg',
   },
   {
     name: 'Apothy Beauty',
@@ -50,7 +50,7 @@ export const projects = [
     tech: ['React', 'Tailwind', 'Video', 'WhatsApp API'],
     url: 'https://ahmedbadway.github.io/Apothy-Beauty/',
     gradient: ['oklch(0.50 0.07 130)', 'oklch(0.17 0.03 140)'],
-    image: 'apothy',
+    image: 'apothy.jpeg',
   },
   {
     name: 'Dasani',
@@ -60,7 +60,7 @@ export const projects = [
     tech: ['React', 'Framer Motion', 'GSAP'],
     url: 'https://ahmedbadway.github.io/Dasani/',
     gradient: ['oklch(0.52 0.09 235)', 'oklch(0.17 0.04 250)'],
-    image: 'dasani',
+    image: 'dasani.jpeg',
   },
   {
     name: 'Lufara',
@@ -70,7 +70,7 @@ export const projects = [
     tech: ['React', 'Tailwind', 'Motion'],
     url: 'https://ahmedbadway.github.io/Lufara/',
     gradient: ['oklch(0.50 0.09 55)', 'oklch(0.17 0.03 45)'],
-    image: 'lufara',
+    image: 'lufara.jpeg',
   },
   {
     name: 'Amr Samir',
@@ -80,6 +80,6 @@ export const projects = [
     tech: ['React', 'Tailwind', 'i18n', 'Motion'],
     url: 'https://ahmedbadway.github.io/AMR-SMAIER/',
     gradient: ['oklch(0.48 0.10 300)', 'oklch(0.16 0.04 290)'],
-    image: 'amr-samir',
+    image: 'amr-samir.png',
   },
 ];
