@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight } from '@phosphor-icons/react';
 
@@ -13,6 +14,12 @@ function initials(name) {
 
 export default function ProjectCard({ project, index }) {
   const [from, to] = project.gradient;
+  // Real live-site screenshot. Falls back to the gradient + monogram cover if
+  // the file isn't present yet (added to public/projects/<slug>.jpg).
+  const [imgOk, setImgOk] = useState(Boolean(project.image));
+  const imgSrc = project.image
+    ? `${import.meta.env.BASE_URL}projects/${project.image}.jpg`
+    : null;
 
   return (
     <motion.article
@@ -46,6 +53,18 @@ export default function ProjectCard({ project, index }) {
             {initials(project.name)}
           </span>
         </div>
+
+        {/* Real screenshot layered over the gradient fallback */}
+        {imgSrc && imgOk ? (
+          <img
+            src={imgSrc}
+            alt={`${project.name} — ${project.type} website by Ahmed Badway`}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImgOk(false)}
+            className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-110"
+          />
+        ) : null}
 
         {/* Type tag */}
         <span className="absolute left-4 top-4 rounded-full bg-bg/55 px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-gold backdrop-blur-sm">
