@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Design tokens — single OKLCH source of truth.
+   Dark-luxury theme: off-black base, warm-gold accent.
+   ============================================================ */
+:root {
+  --bg: oklch(0.145 0.004 60);          /* ~#0a0a0a off-black, never pure #000 */
+  --surface: oklch(0.185 0.005 60);     /* lifted card base */
+  --surface-2: oklch(0.225 0.006 60);   /* hover / nested surface */
+
+  --gold: oklch(0.74 0.092 84);         /* ~#b8963e warm gold */
+  --gold-soft: oklch(0.82 0.085 86);    /* highlight / hover */
+  --gold-dim: oklch(0.62 0.08 82);      /* pressed / borders */
+
+  --text: oklch(0.97 0.004 90);         /* near-white */
+  --text-muted: oklch(0.78 0.006 80);   /* secondary copy */
+  --text-faint: oklch(0.62 0.006 80);   /* tertiary / labels */
+
+  --border: oklch(1 0 0 / 0.08);        /* glass edge */
+  --border-strong: oklch(1 0 0 / 0.14);
+
+  --gold-rgb: 184 150 62;               /* for rgba() glows tied to bg hue */
+
+  color-scheme: dark;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-feature-settings: 'ss01', 'cv01';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--bg);
+}
+
+/* Focus visibility for keyboard users (a11y) */
+:where(a, button, [tabindex]):focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Gold scrollbar accent on supporting browsers */
+@supports (scrollbar-color: auto) {
+  html {
+    scrollbar-color: var(--gold-dim) transparent;
+    scrollbar-width: thin;
+  }
+}
+
+/* ============================================================
+   Component utilities
+   ============================================================ */
+@layer components {
+  /* Glassmorphism surface: blur + 1px edge + inner highlight */
+  .glass {
+    background:
+      linear-gradient(
+        180deg,
+        oklch(1 0 0 / 0.05) 0%,
+        oklch(1 0 0 / 0.02) 100%
+      ),
+      var(--surface);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 0.08),
+      0 24px 60px -32px oklch(0 0 0 / 0.8);
+  }
+
+  /* Solid-fill fallback when transparency is reduced (a11y) */
+  @media (prefers-reduced-transparency: reduce) {
+    .glass {
+      background: var(--surface);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(
+      100deg,
+      var(--gold-soft) 0%,
+      var(--gold) 45%,
+      var(--gold-dim) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Small uppercase mono label (used sparingly per taste-skill) */
+  .eyebrow {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .shell {
+    width: 100%;
+    max-width: 1400px;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .shell {
+      padding-inline: 2.5rem;
+    }
+  }
+}
+
+/* Hide native cursor only where the custom cursor is active */
+.cursor-none,
+.cursor-none * {
+  cursor: none !important;
+}
