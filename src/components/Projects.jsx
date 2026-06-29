@@ -1,6 +1,14 @@
+import { motion } from 'framer-motion';
 import SectionHeading from './SectionHeading.jsx';
 import ProjectCard from './ProjectCard.jsx';
 import { projects } from '../data/projects.js';
+
+// Parent orchestrates a 0.1s stagger so cards enter one after the next
+// rather than all at once. Children supply their own translate/fade.
+const grid = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
+};
 
 export default function Projects() {
   return (
@@ -16,11 +24,17 @@ export default function Projects() {
           </p>
         </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project, i) => (
-            <ProjectCard key={project.name} project={project} index={i} />
+        <motion.div
+          variants={grid}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.15 }}
+          className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {projects.map((project) => (
+            <ProjectCard key={project.name} project={project} />
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -26,6 +26,7 @@ export default function About() {
           <SectionHeading
             eyebrow="About"
             title="Premium work, without the agency price tag."
+            underline
           />
           <motion.p
             initial={{ opacity: 0, y: 20 }}

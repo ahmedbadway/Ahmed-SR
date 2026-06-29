@@ -7,18 +7,23 @@ import { scrollToId } from '../utils/scrollToId.js';
 
 const NAME = 'AHMED BADWAY';
 
-// Per-character reveal for the name.
+// Per-character reveal for the name (0.05s stagger). Reduced-motion visitors
+// get a single soft fade with no vertical travel — see `charVariant` below.
 const container = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.04, delayChildren: 0.15 } },
+  show: { transition: { staggerChildren: 0.05, delayChildren: 0.12 } },
 };
-const char = {
+const charMotion = {
   hidden: { y: '110%', opacity: 0 },
   show: {
     y: '0%',
     opacity: 1,
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
   },
+};
+const charReduced = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { duration: 0.4 } },
 };
 
 // Deterministic-ish particle field (avoids layout cost of many state updates).
@@ -40,6 +45,7 @@ export default function Hero() {
   });
   const yContent = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 120]);
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  const char = reduce ? charReduced : charMotion;
 
   return (
     <section
@@ -99,7 +105,7 @@ export default function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.55, delay: 0.95, ease: [0.16, 1, 0.3, 1] }}
           className="mt-7 max-w-[46ch] font-mono text-sm text-muted sm:text-base md:text-lg"
         >
           Frontend Developer{' '}
@@ -110,7 +116,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.55, delay: 1.15, ease: [0.16, 1, 0.3, 1] }}
           className="mt-10 flex flex-wrap items-center gap-4"
         >
           <Magnetic>

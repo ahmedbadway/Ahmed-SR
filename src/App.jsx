@@ -7,8 +7,11 @@ import Projects from './components/Projects.jsx';
 import Skills from './components/Skills.jsx';
 import Contact from './components/Contact.jsx';
 import Footer from './components/Footer.jsx';
+import { useSmoothScroll } from './hooks/useSmoothScroll.js';
 
 export default function App() {
+  useSmoothScroll();
+
   return (
     <>
       <CustomCursor />
