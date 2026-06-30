@@ -18,6 +18,7 @@ export default function Projects() {
           <SectionHeading
             eyebrow="Selected Work"
             title="Eight builds across luxury, beauty, and health."
+            slide="left"
           />
           <p className="max-w-[34ch] text-sm text-faint md:text-right">
             Every site is custom — no templates. Tap any project to view it live.
