@@ -140,17 +140,18 @@ export default function ProjectCard({ project }) {
   return (
     <motion.article variants={reveal} style={{ height: '440px', perspective: '1000px' }}>
       <motion.div
-        style={{
-          rotateY: flipped ? 180 : 0,
-          transformStyle: 'preserve-3d',
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-        }}
+        animate={{ rotateY: flipped ? 180 : 0 }}
         transition={{ duration: 0.6, ease: 'easeInOut' }}
         onHoverStart={() => setFlipped(true)}
         onHoverEnd={() => setFlipped(false)}
         onClick={() => setFlipped((f) => !f)}
+        style={{
+          transformStyle: 'preserve-3d',
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          cursor: 'pointer',
+        }}
       >
         {/* FRONT — screenshot */}
         <div
@@ -178,7 +179,6 @@ export default function ProjectCard({ project }) {
           className="glass absolute inset-0 rounded-card border border-gold/55 p-7 shadow-[0_0_44px_-6px_rgba(var(--gold-rgb),0.45),inset_0_0_0_1px_rgba(var(--gold-rgb),0.25)]"
           style={{
             backfaceVisibility: 'hidden',
-            rotateY: '180deg',
             transform: 'rotateY(180deg)',
             width: '100%',
             height: '100%',
