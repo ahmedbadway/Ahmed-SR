@@ -7,11 +7,11 @@ import { scrollToId } from '../utils/scrollToId.js';
 
 const NAME = 'AHMED BADWAY';
 
-// Per-character reveal for the name (0.05s stagger). Reduced-motion visitors
-// get a single soft fade with no vertical travel — see `charVariant` below.
+// Per-character reveal for the name (0.08s stagger). Reduced-motion visitors
+// get a single soft fade with no vertical travel — see `charReduced` below.
 const container = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.05, delayChildren: 0.12 } },
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.12 } },
 };
 const charMotion = {
   hidden: { y: '110%', opacity: 0 },
@@ -52,6 +52,38 @@ export default function Hero() {
       ref={ref}
       className="relative flex min-h-[100dvh] items-center overflow-hidden pt-24"
     >
+      {/* Bold gold orb drifting behind the name. Centering lives on the
+          wrapper so framer's x/y transforms (the drift) don't fight it. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
+      >
+        <motion.div
+          className="h-[min(900px,100vw)] w-[min(900px,100vw)] rounded-full"
+          style={{
+            background:
+              'radial-gradient(circle, rgba(var(--gold-soft-rgb), 0.85) 0%, rgba(var(--gold-soft-rgb), 0.55) 24%, rgba(var(--gold-rgb), 0.32) 46%, rgba(var(--gold-rgb), 0.12) 62%, transparent 76%)',
+            filter: 'blur(28px)',
+            willChange: 'transform',
+          }}
+          initial={false}
+          animate={
+            reduce
+              ? { x: 0, y: 0, scale: 1 }
+              : {
+                  x: ['-9%', '9%', '-5%', '-9%'],
+                  y: ['-7%', '6%', '-8%', '-7%'],
+                  scale: [1, 1.16, 1.05, 1],
+                }
+          }
+          transition={
+            reduce
+              ? { duration: 0 }
+              : { duration: 16, repeat: Infinity, ease: 'easeInOut' }
+          }
+        />
+      </div>
+
       {/* Floating particles */}
       {!reduce && (
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
@@ -105,7 +137,7 @@ export default function Hero() {
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.95, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.55, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
           className="mt-7 max-w-[46ch] font-mono text-sm text-muted sm:text-base md:text-lg"
         >
           Frontend Developer{' '}
@@ -116,7 +148,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 1.15, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.55, delay: 1.4, ease: [0.16, 1, 0.3, 1] }}
           className="mt-10 flex flex-wrap items-center gap-4"
         >
           <Magnetic>

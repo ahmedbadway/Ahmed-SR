@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   Atom,
   Wind,
@@ -23,6 +23,7 @@ const skills = [
 ];
 
 export default function Skills() {
+  const reduce = useReducedMotion();
   return (
     <section id="skills" className="relative scroll-mt-24 py-28 md:py-36">
       <div className="shell">
@@ -32,10 +33,19 @@ export default function Skills() {
           {skills.map(({ label, Icon }, i) => (
             <motion.div
               key={label}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.6, y: 16 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 0.5, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
+              transition={
+                reduce
+                  ? { duration: 0.4, delay: i * 0.05 }
+                  : {
+                      delay: i * 0.05,
+                      type: 'spring',
+                      stiffness: 460,
+                      damping: 17,
+                    }
+              }
               whileHover={{ y: -6 }}
               data-magnetic
               className="glass flex items-center gap-3 rounded-card px-5 py-5"

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useCountUp } from '../hooks/useCountUp.js';
 import SectionHeading from './SectionHeading.jsx';
 
@@ -19,6 +19,7 @@ const stats = [
 ];
 
 export default function About() {
+  const reduce = useReducedMotion();
   return (
     <section id="about" className="relative scroll-mt-24 py-28 md:py-36">
       <div className="shell grid gap-14 lg:grid-cols-12 lg:gap-10">
@@ -29,7 +30,7 @@ export default function About() {
             underline
           />
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: reduce ? 0 : 60 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
@@ -47,10 +48,10 @@ export default function About() {
             {stats.map((s, i) => (
               <motion.div
                 key={s.label}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: reduce ? 0 : 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.7, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
                 className="lg:py-7 lg:first:pt-0"
               >
                 {s.kind === 'num' ? (

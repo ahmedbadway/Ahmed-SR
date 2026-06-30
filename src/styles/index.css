@@ -23,6 +23,7 @@
   --border-strong: oklch(1 0 0 / 0.14);
 
   --gold-rgb: 184 150 62;               /* for rgba() glows tied to bg hue */
+  --gold-soft-rgb: 230 192 116;         /* brighter gold for bold glows/orbs */
 
   color-scheme: dark;
 }
