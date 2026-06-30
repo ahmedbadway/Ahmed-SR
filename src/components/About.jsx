@@ -3,10 +3,10 @@ import { useCountUp } from '../hooks/useCountUp.js';
 import SectionHeading from './SectionHeading.jsx';
 
 function StatNumber({ value, suffix = '' }) {
-  const { ref, value: n } = useCountUp(value);
+  const { ref, count } = useCountUp(value);
   return (
     <span ref={ref} className="font-display text-5xl font-bold tracking-tightest text-ink md:text-6xl">
-      {n}
+      {count}
       {suffix}
     </span>
   );

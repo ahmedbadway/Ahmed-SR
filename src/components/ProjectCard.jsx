@@ -99,10 +99,10 @@ function Details({ project, fill = false }) {
 
 export default function ProjectCard({ project }) {
   const [imgOk, setImgOk] = useState(Boolean(project.image));
+  const [flipped, setFlipped] = useState(false);
   const reduce = useReducedMotion();
   const onError = () => setImgOk(false);
 
-  // Child of the Projects stagger container — bold rise on entrance.
   const reveal = {
     hidden: { opacity: 0, y: reduce ? 0 : 60 },
     show: {
@@ -112,8 +112,6 @@ export default function ProjectCard({ project }) {
     },
   };
 
-  // Flip needs a hover-capable pointer; reduced-motion visitors get the
-  // stacked card instead of a spinning one.
   const canHover = useMemo(
     () =>
       typeof window !== 'undefined' &&
@@ -123,7 +121,6 @@ export default function ProjectCard({ project }) {
   const useFlip = canHover && !reduce;
 
   if (!useFlip) {
-    // Stacked card — screenshot on top, details below. Always visible.
     return (
       <motion.article
         variants={reveal}
@@ -140,15 +137,27 @@ export default function ProjectCard({ project }) {
     );
   }
 
-  // 3D flip card (desktop). Hovering rotates the inner panel 180° to reveal
-  // a gold-glowing back face with the full project details.
   return (
-    <motion.article variants={reveal} className="h-[440px] [perspective:1600px]">
-      <div className="relative h-full w-full transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] [transform-style:preserve-3d] hover:[transform:rotateY(180deg)]">
+    <motion.article variants={reveal} style={{ height: '440px', perspective: '1000px' }}>
+      <motion.div
+        style={{
+          rotateY: flipped ? 180 : 0,
+          transformStyle: 'preserve-3d',
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+        }}
+        transition={{ duration: 0.6, ease: 'easeInOut' }}
+        onHoverStart={() => setFlipped(true)}
+        onHoverEnd={() => setFlipped(false)}
+        onClick={() => setFlipped((f) => !f)}
+      >
         {/* FRONT — screenshot */}
-        <div className="glass absolute inset-0 overflow-hidden rounded-card [backface-visibility:hidden]">
+        <div
+          className="glass absolute inset-0 overflow-hidden rounded-card"
+          style={{ backfaceVisibility: 'hidden', width: '100%', height: '100%' }}
+        >
           <Screenshot project={project} imgOk={imgOk} onError={onError} />
-          {/* Bottom scrim with name so the front isn't anonymous */}
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-bg/90 via-bg/40 to-transparent p-5 pt-14">
             <div>
               <span className="font-mono text-[0.7rem] uppercase tracking-[0.14em] text-gold">
@@ -165,10 +174,19 @@ export default function ProjectCard({ project }) {
         </div>
 
         {/* BACK — details, gold border glow */}
-        <div className="glass absolute inset-0 rounded-card border border-gold/55 p-7 shadow-[0_0_44px_-6px_rgba(var(--gold-rgb),0.45),inset_0_0_0_1px_rgba(var(--gold-rgb),0.25)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
+        <div
+          className="glass absolute inset-0 rounded-card border border-gold/55 p-7 shadow-[0_0_44px_-6px_rgba(var(--gold-rgb),0.45),inset_0_0_0_1px_rgba(var(--gold-rgb),0.25)]"
+          style={{
+            backfaceVisibility: 'hidden',
+            rotateY: '180deg',
+            transform: 'rotateY(180deg)',
+            width: '100%',
+            height: '100%',
+          }}
+        >
           <Details project={project} fill />
         </div>
-      </div>
+      </motion.div>
     </motion.article>
   );
 }
