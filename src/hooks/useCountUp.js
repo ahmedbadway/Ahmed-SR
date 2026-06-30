@@ -1,33 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
-import { useInView, useReducedMotion } from 'framer-motion';
+import { useInView } from 'framer-motion';
 
-// Counts from 0 → `target` once the element scrolls into view.
-// Respects reduced-motion by jumping straight to the final value.
-export function useCountUp(target, { duration = 1400 } = {}) {
+export function useCountUp(end, duration = 2000) {
+  const [count, setCount] = useState(0);
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.5 });
-  const reduce = useReducedMotion();
-  const [value, setValue] = useState(0);
+  const inView = useInView(ref, { once: true });
 
   useEffect(() => {
     if (!inView) return;
-    if (reduce) {
-      setValue(target);
-      return;
-    }
+    let start = 0;
+    const step = end / (duration / 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [inView, end, duration]);
 
-    let raf;
-    const start = performance.now();
-    const tick = (now) => {
-      const t = Math.min((now - start) / duration, 1);
-      // easeOutCubic for a natural settle
-      const eased = 1 - Math.pow(1 - t, 3);
-      setValue(Math.round(eased * target));
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [inView, reduce, target, duration]);
-
-  return { ref, value };
+  return { count, ref };
 }
