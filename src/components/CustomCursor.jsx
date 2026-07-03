@@ -4,6 +4,12 @@ import { motion, useMotionValue, useSpring, useReducedMotion } from 'framer-moti
 // Desktop-only gold dot + trailing ring. Pointer position is tracked with
 // motion values (never useState) so it stays off the React render path.
 // No-op on touch devices and under prefers-reduced-motion.
+// Ring is rendered at its hover (largest) size and scaled down at rest, so
+// the hover transition only ever touches `transform`/`opacity` — never
+// width/height/margin — keeping it on the GPU compositor.
+const RING_SIZE = 56;
+const RING_REST_SCALE = 32 / RING_SIZE;
+
 export default function CustomCursor() {
   const reduce = useReducedMotion();
   const [enabled, setEnabled] = useState(false);
@@ -42,16 +48,20 @@ export default function CustomCursor() {
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[90]">
-      {/* Trailing ring */}
+      {/* Trailing ring — fixed size, hover scales it via transform only */}
       <motion.div
         className="absolute left-0 top-0 rounded-full border border-gold"
-        style={{ x: ringX, y: ringY }}
+        style={{
+          x: ringX,
+          y: ringY,
+          width: RING_SIZE,
+          height: RING_SIZE,
+          marginLeft: -RING_SIZE / 2,
+          marginTop: -RING_SIZE / 2,
+        }}
         animate={{
-          width: hovering ? 56 : 32,
-          height: hovering ? 56 : 32,
+          scale: hovering ? 1 : RING_REST_SCALE,
           opacity: hovering ? 0.9 : 0.5,
-          marginLeft: hovering ? -28 : -16,
-          marginTop: hovering ? -28 : -16,
         }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       />

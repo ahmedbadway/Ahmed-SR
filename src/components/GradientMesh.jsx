@@ -1,10 +1,27 @@
+import { useEffect, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 
 // Fixed, GPU-friendly background: layered radial gold/dark blobs over a fine
 // grain. Very subtle — it sets mood without competing with content.
-// Animation is paused under prefers-reduced-motion.
+// Animation is paused under prefers-reduced-motion, and also paused whenever
+// the page itself isn't visible (backgrounded tab, minimized window). This
+// root is `fixed inset-0`, i.e. always geometrically inside the viewport, so
+// an IntersectionObserver on it would only ever report isIntersecting: true
+// and pause nothing — the Page Visibility API is the correct signal for "the
+// user can't currently see this" here, so we use that instead.
 export default function GradientMesh() {
   const reduce = useReducedMotion();
+  const [pageVisible, setPageVisible] = useState(
+    typeof document === 'undefined' || document.visibilityState === 'visible'
+  );
+
+  useEffect(() => {
+    const onVisibilityChange = () => setPageVisible(document.visibilityState === 'visible');
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, []);
+
+  const running = !reduce && pageVisible;
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
@@ -13,8 +30,8 @@ export default function GradientMesh() {
 
       {/* Gold mesh blobs */}
       <div
-        className={`absolute -left-[20%] -top-[25%] h-[70vmax] w-[70vmax] rounded-full opacity-[0.16] blur-[120px] ${
-          reduce ? '' : 'animate-gradient-pan'
+        className={`absolute -left-[20%] -top-[25%] h-[70vmax] w-[70vmax] rounded-full opacity-[0.16] blur-[48px] ${
+          running ? 'animate-gradient-pan' : ''
         }`}
         style={{
           background:
@@ -22,8 +39,8 @@ export default function GradientMesh() {
         }}
       />
       <div
-        className={`absolute -bottom-[30%] -right-[15%] h-[60vmax] w-[60vmax] rounded-full opacity-[0.12] blur-[130px] ${
-          reduce ? '' : 'animate-gradient-pan'
+        className={`absolute -bottom-[30%] -right-[15%] h-[60vmax] w-[60vmax] rounded-full opacity-[0.12] blur-[52px] ${
+          running ? 'animate-gradient-pan' : ''
         }`}
         style={{
           animationDelay: '-9s',

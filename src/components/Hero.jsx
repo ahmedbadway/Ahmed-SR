@@ -58,29 +58,19 @@ export default function Hero() {
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
       >
-        <motion.div
-          className="h-[min(900px,100vw)] w-[min(900px,100vw)] rounded-full"
+        {/* CSS keyframe drift (see `orb-drift` in tailwind.config.js) instead of
+            Framer's x/y/scale shorthand — runs on the compositor thread
+            rather than being ticked via rAF on the main thread. */}
+        <div
+          className={`h-[min(900px,100vw)] w-[min(900px,100vw)] rounded-full ${
+            reduce ? '' : 'animate-orb-drift'
+          }`}
           style={{
             background:
               'radial-gradient(circle, rgba(var(--gold-soft-rgb), 0.85) 0%, rgba(var(--gold-soft-rgb), 0.55) 24%, rgba(var(--gold-rgb), 0.32) 46%, rgba(var(--gold-rgb), 0.12) 62%, transparent 76%)',
             filter: 'blur(28px)',
             willChange: 'transform',
           }}
-          initial={false}
-          animate={
-            reduce
-              ? { x: 0, y: 0, scale: 1 }
-              : {
-                  x: ['-9%', '9%', '-5%', '-9%'],
-                  y: ['-7%', '6%', '-8%', '-7%'],
-                  scale: [1, 1.16, 1.05, 1],
-                }
-          }
-          transition={
-            reduce
-              ? { duration: 0 }
-              : { duration: 16, repeat: Infinity, ease: 'easeInOut' }
-          }
         />
       </div>
 
