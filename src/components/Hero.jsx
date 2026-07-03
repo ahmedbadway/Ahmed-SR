@@ -7,6 +7,10 @@ import { scrollToId } from '../utils/scrollToId.js';
 
 const NAME = 'AHMED BADWAY';
 
+// Stable module-level reference so it never becomes a "new" prop identity on a
+// Hero re-render — that would restart Typewriter's typing effect needlessly.
+const TYPEWRITER_WORDS = ['React', 'Framer Motion', 'AI-Powered Visuals'];
+
 // Per-character reveal for the name (0.08s stagger). Reduced-motion visitors
 // get a single soft fade with no vertical travel — see `charReduced` below.
 const container = {
@@ -135,7 +139,7 @@ export default function Hero() {
         >
           Frontend Developer{' '}
           <span className="text-faint">&mdash;</span>{' '}
-          <Typewriter words={['React', 'Framer Motion', 'AI-Powered Visuals']} />
+          <Typewriter words={TYPEWRITER_WORDS} />
         </motion.p>
 
         <motion.div

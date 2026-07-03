@@ -1,9 +1,16 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 
 // Cycles through `words`, typing and deleting each with a blinking caret.
 // Under reduced-motion it shows the first word statically (no caret churn).
-export default function Typewriter({ words, className = '' }) {
+//
+// The per-character setState fires up to ~11x/second, so this component is the
+// page's most frequent re-render source. Two things keep that from inflating
+// INP: all typing state (text/deleting/index) is LOCAL, so a tick re-renders
+// ONLY this component and never the parent Hero (verified — Hero holds none of
+// it); and the timeout is cleared on every effect re-run and on unmount. The
+// memo() wrapper additionally shields it from any future parent re-render.
+function Typewriter({ words, className = '' }) {
   const reduce = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [text, setText] = useState('');
@@ -48,3 +55,5 @@ export default function Typewriter({ words, className = '' }) {
     </span>
   );
 }
+
+export default memo(Typewriter);

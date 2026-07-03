@@ -24,7 +24,10 @@ export default function GradientMesh() {
   const running = !reduce && pageVisible;
 
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+    <div
+      aria-hidden="true"
+      className="gradient-mesh pointer-events-none fixed inset-0 z-0 overflow-hidden"
+    >
       {/* Base wash */}
       <div className="absolute inset-0 bg-bg" />
 
@@ -49,14 +52,9 @@ export default function GradientMesh() {
         }}
       />
 
-      {/* Fine grain to kill banding on the blur */}
-      <div
-        className="absolute inset-0 opacity-[0.035] mix-blend-soft-light"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-        }}
-      />
+      {/* Fine grain (soft-light noise) is painted via the `.gradient-mesh::after`
+          pseudo-element in index.css — kept out of the DOM so it can't be
+          selected as the LCP element. */}
 
       {/* Vignette to focus the center */}
       <div
