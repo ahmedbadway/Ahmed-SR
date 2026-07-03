@@ -9,10 +9,10 @@ export function useSmoothScroll() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
 
+    // lerp-based damping (no duration/easing) — cheaper per-frame math than a
+    // duration+easing tween and more responsive to interrupted scroll input.
     const lenis = new Lenis({
-      duration: 1.05,
-      // easeOutExpo — fast to start, soft to settle (matches the site's easing)
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.05,
       smoothWheel: true,
       touchMultiplier: 1.6,
     });
