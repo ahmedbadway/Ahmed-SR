@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { frame, cancelFrame } from 'framer-motion';
 import Lenis from 'lenis';
 import { setLenis } from '../utils/lenis.js';
 
@@ -18,15 +19,17 @@ export function useSmoothScroll() {
     });
     setLenis(lenis);
 
-    let raf;
-    const loop = (time) => {
-      lenis.raf(time);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
+    // Drive Lenis from Framer Motion's single shared rAF loop instead of a
+    // second, independent requestAnimationFrame. Previously Lenis ran its own
+    // rAF while Hero's `useScroll` ran Framer's rAF — two loops per frame,
+    // out of phase, each triggering scroll-linked measurement and its own
+    // layer commits (the continuous UpdateLayer storm in the trace). Sharing
+    // one loop keeps Lenis and every Framer scroll animation on the same tick.
+    const update = (data) => lenis.raf(data.timestamp);
+    frame.update(update, true);
 
     return () => {
-      cancelAnimationFrame(raf);
+      cancelFrame(update);
       setLenis(null);
       lenis.destroy();
     };
