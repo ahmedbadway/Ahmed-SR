@@ -153,15 +153,20 @@ export default function ProjectCard({ project }) {
 
   return (
     <motion.article variants={reveal} style={{ height: '440px', perspective: '1000px' }}>
-      <motion.div
-        animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={{ duration: 0.6, ease: 'easeInOut' }}
-        onHoverStart={() => setFlipped(true)}
-        onHoverEnd={() => setFlipped(false)}
+      {/* The flip is a plain CSS `transition` on transform, not a Framer
+          rAF animation. Framer animated rotateY on the main thread — it
+          reapplied the transform in JS every frame, so the flip stuttered
+          whenever the main thread was busy (Lenis, background motion). A CSS
+          transition runs on the compositor and stays smooth under load. */}
+      <div
+        onMouseEnter={() => setFlipped(true)}
+        onMouseLeave={() => setFlipped(false)}
         onClick={() => setFlipped((f) => !f)}
         style={{
           transformStyle: 'preserve-3d',
           WebkitTransformStyle: 'preserve-3d',
+          transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+          transition: 'transform 0.6s ease-in-out',
           position: 'relative',
           width: '100%',
           height: '100%',
@@ -199,7 +204,7 @@ export default function ProjectCard({ project }) {
         >
           <Details project={project} fill />
         </div>
-      </motion.div>
+      </div>
     </motion.article>
   );
 }

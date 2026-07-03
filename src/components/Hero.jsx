@@ -27,7 +27,10 @@ const charReduced = {
 };
 
 // Deterministic-ish particle field (avoids layout cost of many state updates).
-const particles = Array.from({ length: 16 }, (_, i) => ({
+// Kept intentionally small: each particle is a separately composited layer
+// running an infinite float animation that keeps ticking even while the Hero
+// is scrolled off-screen, so the count is a permanent background GPU cost.
+const particles = Array.from({ length: 6 }, (_, i) => ({
   id: i,
   left: (i * 61.8) % 100,
   top: (i * 37.5) % 100,
