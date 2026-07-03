@@ -137,6 +137,20 @@ export default function ProjectCard({ project }) {
     );
   }
 
+  // backdrop-filter (used by .glass) creates a stacking context that collapses
+  // transform-style:preserve-3d and breaks the 3D flip. Inline the glass look
+  // without backdrop-filter so both faces can live in 3D space correctly.
+  const faceBase = {
+    backfaceVisibility: 'hidden',
+    WebkitBackfaceVisibility: 'hidden',
+    position: 'absolute',
+    inset: 0,
+    borderRadius: '16px',
+    background: 'var(--surface)',
+    border: '1px solid var(--border)',
+    boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.08), 0 24px 60px -32px oklch(0 0 0 / 0.8)',
+  };
+
   return (
     <motion.article variants={reveal} style={{ height: '440px', perspective: '1000px' }}>
       <motion.div
@@ -147,6 +161,7 @@ export default function ProjectCard({ project }) {
         onClick={() => setFlipped((f) => !f)}
         style={{
           transformStyle: 'preserve-3d',
+          WebkitTransformStyle: 'preserve-3d',
           position: 'relative',
           width: '100%',
           height: '100%',
@@ -154,10 +169,7 @@ export default function ProjectCard({ project }) {
         }}
       >
         {/* FRONT — screenshot */}
-        <div
-          className="glass absolute inset-0 overflow-hidden rounded-card"
-          style={{ backfaceVisibility: 'hidden', width: '100%', height: '100%' }}
-        >
+        <div style={{ ...faceBase, overflow: 'hidden' }}>
           <Screenshot project={project} imgOk={imgOk} onError={onError} />
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-bg/90 via-bg/40 to-transparent p-5 pt-14">
             <div>
@@ -168,7 +180,7 @@ export default function ProjectCard({ project }) {
                 {project.name}
               </h3>
             </div>
-            <span className="shrink-0 rounded-full border border-line bg-bg/50 px-3 py-1 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-faint backdrop-blur-sm">
+            <span className="shrink-0 rounded-full border border-line bg-bg/50 px-3 py-1 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-faint">
               Hover
             </span>
           </div>
@@ -176,12 +188,13 @@ export default function ProjectCard({ project }) {
 
         {/* BACK — details, gold border glow */}
         <div
-          className="glass absolute inset-0 rounded-card border border-gold/55 p-7 shadow-[0_0_44px_-6px_rgba(var(--gold-rgb),0.45),inset_0_0_0_1px_rgba(var(--gold-rgb),0.25)]"
           style={{
-            backfaceVisibility: 'hidden',
+            ...faceBase,
             transform: 'rotateY(180deg)',
-            width: '100%',
-            height: '100%',
+            border: '1px solid rgba(var(--gold-rgb), 0.55)',
+            boxShadow:
+              '0 0 44px -6px rgba(var(--gold-rgb), 0.45), inset 0 0 0 1px rgba(var(--gold-rgb), 0.25), inset 0 1px 0 oklch(1 0 0 / 0.08)',
+            padding: '1.75rem',
           }}
         >
           <Details project={project} fill />
