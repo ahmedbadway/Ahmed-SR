@@ -7,23 +7,27 @@
    Dark-luxury theme: off-black base, warm-gold accent.
    ============================================================ */
 :root {
-  --bg: oklch(0.145 0.004 60);          /* ~#0a0a0a off-black, never pure #000 */
-  --surface: oklch(0.185 0.005 60);     /* lifted card base */
-  --surface-2: oklch(0.225 0.006 60);   /* hover / nested surface */
+  /* Cool near-black base (faint slate tint) so the warm accent reads crisp and
+     modern instead of muddy — a contemporary jeweler contrast, never pure #000. */
+  --bg: oklch(0.15 0.008 265);          /* deep cool off-black */
+  --surface: oklch(0.198 0.010 265);    /* lifted card base */
+  --surface-2: oklch(0.242 0.013 265);  /* hover / nested surface */
 
-  --gold: oklch(0.74 0.092 84);         /* ~#b8963e warm gold */
-  --gold-soft: oklch(0.82 0.085 86);    /* highlight / hover */
-  --gold-dim: oklch(0.62 0.08 82);      /* pressed / borders */
+  /* Luminous champagne-gold — brighter + more chroma than the old muted brown
+     so it feels current and expensive rather than dated. */
+  --gold: oklch(0.81 0.125 88);         /* primary champagne gold */
+  --gold-soft: oklch(0.89 0.105 92);    /* highlight / hover */
+  --gold-dim: oklch(0.67 0.115 84);     /* pressed / borders */
 
-  --text: oklch(0.97 0.004 90);         /* near-white */
-  --text-muted: oklch(0.78 0.006 80);   /* secondary copy */
-  --text-faint: oklch(0.62 0.006 80);   /* tertiary / labels */
+  --text: oklch(0.98 0.003 260);        /* near-white, faint cool cast */
+  --text-muted: oklch(0.78 0.006 260);  /* secondary copy */
+  --text-faint: oklch(0.60 0.008 260);  /* tertiary / labels */
 
-  --border: oklch(1 0 0 / 0.08);        /* glass edge */
-  --border-strong: oklch(1 0 0 / 0.14);
+  --border: oklch(1 0 0 / 0.09);        /* glass edge */
+  --border-strong: oklch(1 0 0 / 0.15);
 
-  --gold-rgb: 184 150 62;               /* for rgba() glows tied to bg hue */
-  --gold-soft-rgb: 230 192 116;         /* brighter gold for bold glows/orbs */
+  --gold-rgb: 232 184 77;               /* for rgba() glows — matches --gold */
+  --gold-soft-rgb: 246 219 142;         /* brighter gold for bold glows/orbs */
 
   color-scheme: dark;
 }
@@ -147,12 +151,6 @@ body {
       padding-inline: 2.5rem;
     }
   }
-}
-
-/* Hide native cursor only where the custom cursor is active */
-.cursor-none,
-.cursor-none * {
-  cursor: none !important;
 }
 
 /* Fine grain that kills banding on the background blur. It lives on a

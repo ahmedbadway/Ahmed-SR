@@ -12,9 +12,13 @@ export function useSmoothScroll() {
 
     // lerp-based damping (no duration/easing) — cheaper per-frame math than a
     // duration+easing tween and more responsive to interrupted scroll input.
+    // lerp was 0.05, which trailed the wheel so far behind the pointer that
+    // the whole page read as "laggy". 0.11 keeps a premium glide while
+    // tracking input closely enough to feel instant.
     const lenis = new Lenis({
-      lerp: 0.05,
+      lerp: 0.11,
       smoothWheel: true,
+      wheelMultiplier: 1,
       touchMultiplier: 1.6,
     });
     setLenis(lenis);

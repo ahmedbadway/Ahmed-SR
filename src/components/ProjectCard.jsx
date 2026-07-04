@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from '@phosphor-icons/react';
 
@@ -84,6 +84,9 @@ function Details({ project, fill = false }) {
         target="_blank"
         rel="noopener noreferrer"
         data-magnetic
+        // Stop the tap from bubbling to the card's flip toggle so opening the
+        // live site on touch doesn't also flip the card back mid-tap.
+        onClick={(e) => e.stopPropagation()}
         className="group/btn mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-gold/50 px-5 py-2.5 text-sm font-semibold text-gold transition-colors duration-200 hover:bg-gold hover:text-bg"
       >
         Live Site
@@ -100,6 +103,7 @@ function Details({ project, fill = false }) {
 export default function ProjectCard({ project }) {
   const [imgOk, setImgOk] = useState(Boolean(project.image));
   const [flipped, setFlipped] = useState(false);
+  const lastPointer = useRef('mouse');
   const reduce = useReducedMotion();
   const onError = () => setImgOk(false);
 
@@ -118,7 +122,10 @@ export default function ProjectCard({ project }) {
       window.matchMedia('(hover: hover)').matches,
     []
   );
-  const useFlip = canHover && !reduce;
+  // Flip on every device that allows motion. Desktop flips on hover; touch
+  // flips on tap (the container's onClick). Only reduced-motion visitors get
+  // the flat stacked layout.
+  const useFlip = !reduce;
 
   if (!useFlip) {
     return (
@@ -136,6 +143,26 @@ export default function ProjectCard({ project }) {
       </motion.article>
     );
   }
+
+  // Flip triggers are pointer-type aware rather than gated on a (hover) media
+  // query (that query is unreliable across engines/emulators). A mouse flips on
+  // enter/leave; a touch flips on tap. The lastPointer ref stops a mouse click
+  // from cancelling the hover flip, and stops a tap's synthetic mouseenter from
+  // fighting the tap toggle — the exact conflict that broke mobile flipping.
+  const flipHandlers = {
+    onPointerDown: (e) => {
+      lastPointer.current = e.pointerType;
+    },
+    onPointerEnter: (e) => {
+      if (e.pointerType === 'mouse') setFlipped(true);
+    },
+    onPointerLeave: (e) => {
+      if (e.pointerType === 'mouse') setFlipped(false);
+    },
+    onClick: () => {
+      if (lastPointer.current !== 'mouse') setFlipped((f) => !f);
+    },
+  };
 
   // backdrop-filter (used by .glass) creates a stacking context that collapses
   // transform-style:preserve-3d and breaks the 3D flip. Inline the glass look
@@ -159,9 +186,7 @@ export default function ProjectCard({ project }) {
           whenever the main thread was busy (Lenis, background motion). A CSS
           transition runs on the compositor and stays smooth under load. */}
       <div
-        onMouseEnter={() => setFlipped(true)}
-        onMouseLeave={() => setFlipped(false)}
-        onClick={() => setFlipped((f) => !f)}
+        {...flipHandlers}
         style={{
           transformStyle: 'preserve-3d',
           WebkitTransformStyle: 'preserve-3d',
@@ -186,7 +211,7 @@ export default function ProjectCard({ project }) {
               </h3>
             </div>
             <span className="shrink-0 rounded-full border border-line bg-bg/50 px-3 py-1 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-faint">
-              Hover
+              {canHover ? 'Hover' : 'Tap'}
             </span>
           </div>
         </div>
