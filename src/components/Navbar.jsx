@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { List, X } from '@phosphor-icons/react';
+import { List, X, PenNib } from '@phosphor-icons/react';
 import { scrollToId } from '../utils/scrollToId.js';
 import { getLenis } from '../utils/lenis.js';
+import { navigate } from '../hooks/useHashRoute.js';
 
 const links = [
   { id: 'about', label: 'About' },
@@ -10,9 +11,10 @@ const links = [
   { id: 'skills', label: 'Skills' },
 ];
 
-export default function Navbar() {
+export default function Navbar({ route = '/' }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const onHome = route === '/';
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -36,7 +38,19 @@ export default function Navbar() {
 
   const go = (id) => {
     setOpen(false);
-    scrollToId(id);
+    // Section anchors only exist on the home route. From the build page, route
+    // home first, then scroll once the sections have mounted.
+    if (onHome) {
+      scrollToId(id);
+    } else {
+      navigate('/');
+      setTimeout(() => scrollToId(id), 90);
+    }
+  };
+
+  const goBuild = () => {
+    setOpen(false);
+    navigate('/build');
   };
 
   return (
@@ -52,14 +66,14 @@ export default function Navbar() {
         }`}
       >
         <button
-          onClick={() => go('main')}
+          onClick={() => (onHome ? go('main') : navigate('/'))}
           className="font-display text-base font-bold tracking-tightest text-ink"
         >
           AB<span className="text-gold">.</span>
         </button>
 
         {/* Desktop links */}
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-7 md:flex">
           {links.map((l) => (
             <button
               key={l.id}
@@ -73,9 +87,21 @@ export default function Navbar() {
           <button
             data-magnetic
             onClick={() => go('contact')}
-            className="rounded-full bg-gold px-5 py-2 text-sm font-semibold text-bg transition-transform duration-200 hover:bg-gold-soft active:scale-[0.97]"
+            className="text-sm text-muted transition-colors hover:text-ink"
           >
             Contact
+          </button>
+          <button
+            data-magnetic
+            onClick={goBuild}
+            className={`flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-colors duration-200 active:scale-[0.97] ${
+              onHome
+                ? 'bg-gold text-bg hover:bg-gold-soft'
+                : 'border border-gold bg-gold/12 text-gold'
+            }`}
+          >
+            <PenNib size={16} weight="fill" />
+            Build a Design
           </button>
         </div>
 
@@ -110,6 +136,13 @@ export default function Navbar() {
                   {l.label}
                 </button>
               ))}
+              <button
+                onClick={goBuild}
+                className="mt-1 flex items-center gap-2 rounded-xl bg-gold px-4 py-3 text-left text-lg font-semibold text-bg transition-colors hover:bg-gold-soft"
+              >
+                <PenNib size={19} weight="fill" />
+                Build a Design
+              </button>
             </div>
           </motion.div>
         ) : null}

@@ -4,12 +4,20 @@ import { ArrowDown, ArrowUpRight } from '@phosphor-icons/react';
 import Magnetic from './Magnetic.jsx';
 import Typewriter from './Typewriter.jsx';
 import { scrollToId } from '../utils/scrollToId.js';
+import { navigate } from '../hooks/useHashRoute.js';
 
 const NAME = 'AHMED BADWAY';
 
 // Stable module-level reference so it never becomes a "new" prop identity on a
 // Hero re-render — that would restart Typewriter's typing effect needlessly.
-const TYPEWRITER_WORDS = ['React', 'Framer Motion', 'AI-Powered Visuals'];
+// These are the *kinds of work* Ahmed ships (outcomes), not a tech-skill list —
+// a skills carousel reads as a template; naming the deliverable reads as a pro.
+const TYPEWRITER_WORDS = [
+  'e-commerce stores',
+  'clinic websites',
+  'brand landings',
+  'portfolios',
+];
 
 // Per-character reveal for the name (0.08s stagger). Reduced-motion visitors
 // get a single soft fade with no vertical travel — see `charReduced` below.
@@ -135,10 +143,9 @@ export default function Hero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-7 max-w-[46ch] font-mono text-sm text-muted sm:text-base md:text-lg"
+          className="mt-7 max-w-[52ch] font-mono text-sm text-muted sm:text-base md:text-lg"
         >
-          Frontend Developer{' '}
-          <span className="text-faint">&mdash;</span>{' '}
+          I design &amp; build premium{' '}
           <Typewriter words={TYPEWRITER_WORDS} />
         </motion.p>
 
@@ -174,6 +181,19 @@ export default function Hero() {
               />
             </button>
           </Magnetic>
+
+          <button
+            onClick={() => navigate('/build')}
+            data-magnetic
+            className="group inline-flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-gold"
+          >
+            Or build your design
+            <ArrowUpRight
+              size={15}
+              weight="bold"
+              className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            />
+          </button>
         </motion.div>
       </motion.div>
 
