@@ -20,7 +20,6 @@ export default function Footer() {
             © {year} — {t('footer.place')}
           </span>
           <button
-            data-magnetic
             onClick={() => scrollToId('main')}
             className="group flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm text-muted transition-colors hover:border-gold hover:text-ink"
           >

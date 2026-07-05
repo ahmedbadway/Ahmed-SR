@@ -47,7 +47,6 @@ export default function Skills() {
                   : { delay: i * 0.05, type: 'spring', stiffness: 460, damping: 17 }
               }
               whileHover={{ y: -6 }}
-              data-magnetic
               className="glass flex items-center gap-3 rounded-card px-5 py-5"
             >
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold/10 text-gold">

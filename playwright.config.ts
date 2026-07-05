@@ -1,79 +1,57 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
-
-/**
+ * Playwright configuration.
  * See https://playwright.dev/docs/test-configuration.
+ *
+ * The app is a static SPA served under the GitHub-Pages base path `/Ahmed-SR/`.
+ * `webServer` builds and previews it, and `baseURL` points at that base so tests
+ * can navigate with `page.goto('/')`.
+ *
+ * PW_EXECUTABLE_PATH lets an environment with a pre-installed Chromium (that
+ * doesn't match this Playwright build's pinned browser) run the suite without a
+ * download — leave it unset in CI so Playwright uses its own managed browsers.
  */
+const executablePath = process.env.PW_EXECUTABLE_PATH || undefined;
+
 export default defineConfig({
   testDir: './tests',
-  /* Run tests in files in parallel */
   fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  use: {
-    /* Base URL to use in actions like `await page.goto('')`. */
-    // baseURL: 'http://localhost:3000',
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+  use: {
+    baseURL: 'http://localhost:4173/Ahmed-SR/',
     trace: 'on-first-retry',
+    launchOptions: executablePath ? { executablePath } : {},
   },
 
-  /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
     },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] },
+    },
   ],
 
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  /* Build once and preview it for the whole run. */
+  webServer: {
+    command: 'npm run build && npm run preview -- --port 4173',
+    url: 'http://localhost:4173/Ahmed-SR/',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
+  },
 });
