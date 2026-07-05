@@ -81,7 +81,6 @@ export default function Navbar({ route = '/' }) {
           {links.map((l) => (
             <button
               key={l.id}
-              data-magnetic
               onClick={() => go(l.id)}
               className="text-sm text-muted transition-colors hover:text-ink"
             >
@@ -89,14 +88,12 @@ export default function Navbar({ route = '/' }) {
             </button>
           ))}
           <button
-            data-magnetic
             onClick={() => go('contact')}
             className="text-sm text-muted transition-colors hover:text-ink"
           >
             {t('nav.contact')}
           </button>
           <button
-            data-magnetic
             onClick={goBuild}
             className={`flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-colors duration-200 active:scale-[0.97] ${
               onHome

@@ -78,7 +78,6 @@ function Chip({ active, children, onClick, Icon }) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      data-magnetic
       style={{ transitionTimingFunction: EASE_OUT }}
       className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-[color,background-color,border-color,transform] duration-200 active:scale-95 ${
         active
@@ -206,7 +205,6 @@ export default function BuildYourDesign() {
           <button
             type="button"
             onClick={() => navigate('/')}
-            data-magnetic
             className="group inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-ink"
           >
             <ArrowLeft

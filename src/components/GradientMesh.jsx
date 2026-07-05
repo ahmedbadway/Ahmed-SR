@@ -9,7 +9,7 @@ import { useReducedMotion } from 'framer-motion';
 // an IntersectionObserver on it would only ever report isIntersecting: true
 // and pause nothing — the Page Visibility API is the correct signal for "the
 // user can't currently see this" here, so we use that instead.
-export default function GradientMesh({ animate = true }) {
+export default function GradientMesh() {
   const reduce = useReducedMotion();
   const [pageVisible, setPageVisible] = useState(
     typeof document === 'undefined' || document.visibilityState === 'visible'
@@ -21,9 +21,9 @@ export default function GradientMesh({ animate = true }) {
     return () => document.removeEventListener('visibilitychange', onVisibilityChange);
   }, []);
 
-  // `animate={false}` (passed when a video backdrop is covering the mesh) parks
-  // the infinite blob drift so it costs nothing while hidden.
-  const running = animate && !reduce && pageVisible;
+  // Park the infinite blob drift under reduced-motion or when the tab is hidden
+  // so it costs nothing while it can't be seen.
+  const running = !reduce && pageVisible;
 
   return (
     <div

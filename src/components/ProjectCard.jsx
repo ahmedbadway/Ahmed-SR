@@ -1,7 +1,25 @@
-import { useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import { useLang } from '../i18n/LanguageProvider.jsx';
+
+// True only on devices with a real hover-capable pointer (desktop mouse/trackpad).
+// Touch phones and tablets report `hover: none` — there the flip-on-hover
+// interaction is unreliable, so those visitors get the full stacked card with
+// every detail visible up front instead of a tap-to-reveal they might miss.
+function useHoverCapable() {
+  const query = '(hover: hover) and (pointer: fine)';
+  const [canHover, setCanHover] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(query).matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = () => setCanHover(mq.matches);
+    mq.addEventListener?.('change', onChange);
+    return () => mq.removeEventListener?.('change', onChange);
+  }, []);
+  return canHover;
+}
 
 function initials(name) {
   return name
@@ -84,7 +102,6 @@ function Details({ project, type, description, live, fill = false }) {
         href={project.url}
         target="_blank"
         rel="noopener noreferrer"
-        data-magnetic
         onClick={(e) => e.stopPropagation()}
         className="group/btn mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-gold/50 px-5 py-2.5 text-sm font-semibold text-gold transition-colors duration-200 hover:bg-gold hover:text-bg"
       >
@@ -108,8 +125,8 @@ export default function ProjectCard({ project }) {
 
   const [imgOk, setImgOk] = useState(Boolean(project.image));
   const [flipped, setFlipped] = useState(false);
-  const lastPointer = useRef('mouse');
   const reduce = useReducedMotion();
+  const canHover = useHoverCapable();
   const onError = () => setImgOk(false);
 
   const reveal = {
@@ -121,7 +138,9 @@ export default function ProjectCard({ project }) {
     },
   };
 
-  const useFlip = !reduce;
+  // Flip is a desktop-hover delight only. Touch devices and reduced-motion
+  // visitors get the stacked layout below with all details always visible.
+  const useFlip = !reduce && canHover;
 
   if (!useFlip) {
     return (
@@ -140,23 +159,11 @@ export default function ProjectCard({ project }) {
     );
   }
 
-  // Flip triggers are pointer-type aware (a hover media query is unreliable
-  // across engines): a mouse flips on enter/leave, a touch flips on tap. The
-  // lastPointer ref stops a mouse click from cancelling the hover flip and a
-  // tap's synthetic mouseenter from fighting the tap toggle.
+  // Hover-only flip: this branch runs solely on hover-capable pointers, so a
+  // plain enter/leave is all that's needed — no pointer-type bookkeeping.
   const flipHandlers = {
-    onPointerDown: (e) => {
-      lastPointer.current = e.pointerType;
-    },
-    onPointerEnter: (e) => {
-      if (e.pointerType === 'mouse') setFlipped(true);
-    },
-    onPointerLeave: (e) => {
-      if (e.pointerType === 'mouse') setFlipped(false);
-    },
-    onClick: () => {
-      if (lastPointer.current !== 'mouse') setFlipped((f) => !f);
-    },
+    onPointerEnter: () => setFlipped(true),
+    onPointerLeave: () => setFlipped(false),
   };
 
   // backdrop-filter would collapse preserve-3d, so inline the glass look here.
@@ -200,7 +207,7 @@ export default function ProjectCard({ project }) {
               </h3>
             </div>
             <span className="shrink-0 rounded-full border border-line bg-bg/50 px-3 py-1 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-faint">
-              {t('projects.tap')}
+              {t('projects.hover')}
             </span>
           </div>
         </div>

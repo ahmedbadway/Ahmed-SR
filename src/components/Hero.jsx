@@ -149,7 +149,6 @@ export default function Hero() {
 
           <button
             onClick={() => navigate('/build')}
-            data-magnetic
             className="group inline-flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-gold"
           >
             {t('hero.orBuild')}

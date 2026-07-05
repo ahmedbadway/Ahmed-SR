@@ -37,9 +37,8 @@ export const translations = {
     'projects.eyebrow': 'Selected Work',
     'projects.title': 'Eight builds across luxury, beauty, and health.',
     'projects.intro':
-      'Every site is custom — no templates. Tap any project to view it live.',
+      'Every site is custom — no templates. Open any project to view it live.',
     'projects.hover': 'Hover',
-    'projects.tap': 'Tap',
     'projects.live': 'Live Site',
 
     'skills.title': 'The toolkit behind the work.',
@@ -171,9 +170,8 @@ export const translations = {
     'projects.eyebrow': 'أعمال مختارة',
     'projects.title': 'ثمانية مواقع في الفخامة والجمال والصحة.',
     'projects.intro':
-      'كل موقع مصمَّم من الصفر — من غير قوالب. دوس على أي مشروع تشوفه لايف.',
+      'كل موقع مصمَّم من الصفر — من غير قوالب. افتح أي مشروع تشوفه لايف.',
     'projects.hover': 'مرّر',
-    'projects.tap': 'دوس',
     'projects.live': 'زيارة الموقع',
 
     'skills.title': 'الأدوات اللي ورا الشغل.',
