@@ -9,12 +9,18 @@ import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/500.css';
+// Arabic display + body face (loaded once; used when dir="rtl").
+import '@fontsource/cairo/500.css';
+import '@fontsource/cairo/700.css';
 
 import App from './App.jsx';
+import { LanguageProvider } from './i18n/LanguageProvider.jsx';
 import './styles/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
   </React.StrictMode>
 );

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Phone,
   WhatsappLogo,
@@ -8,58 +8,31 @@ import {
   ArrowUpRight,
 } from '@phosphor-icons/react';
 import SectionHeading from './SectionHeading.jsx';
-
-const channels = [
-  {
-    label: 'Call',
-    value: '+20 155 288 6293',
-    href: 'tel:+201552886293',
-    Icon: Phone,
-    external: false,
-  },
-  {
-    label: 'WhatsApp',
-    value: 'Message me directly',
-    href: 'https://wa.me/201552886293',
-    Icon: WhatsappLogo,
-    external: true,
-  },
-  {
-    label: 'Email',
-    value: 'ahoshos@icloud.com',
-    href: 'mailto:ahoshos@icloud.com',
-    Icon: EnvelopeSimple,
-    external: false,
-  },
-  {
-    label: 'Instagram',
-    value: '@ahoshos993',
-    href: 'https://instagram.com/ahoshos993',
-    Icon: InstagramLogo,
-    external: true,
-  },
-  {
-    label: 'GitHub',
-    value: 'ahmedbadway',
-    href: 'https://github.com/ahmedbadway',
-    Icon: GithubLogo,
-    external: true,
-  },
-];
+import { useLang } from '../i18n/LanguageProvider.jsx';
 
 export default function Contact() {
+  const { t } = useLang();
+
+  const channels = [
+    { label: t('contact.call'), value: '+20 155 288 6293', href: 'tel:+201552886293', Icon: Phone, external: false },
+    { label: t('contact.whatsapp'), value: t('contact.whatsappValue'), href: 'https://wa.me/201552886293', Icon: WhatsappLogo, external: true },
+    { label: t('contact.email'), value: 'ahoshos@icloud.com', href: 'mailto:ahoshos@icloud.com', Icon: EnvelopeSimple, external: false },
+    { label: t('contact.instagram'), value: '@ahoshos993', href: 'https://instagram.com/ahoshos993', Icon: InstagramLogo, external: true },
+    { label: t('contact.github'), value: 'ahmedbadway', href: 'https://github.com/ahmedbadway', Icon: GithubLogo, external: true },
+  ];
+
   return (
-    <section id="contact" className="relative scroll-mt-24 py-28 md:py-36">
+    <section id="contact" className="cv-auto relative scroll-mt-24 py-28 md:py-36">
       <div className="shell">
         <SectionHeading
-          eyebrow="Contact"
-          title="Have a project in mind? Let's build it."
-          lead="Available for freelance work — luxury brands, clinics, e-commerce, and beyond. Pick whichever channel suits you."
+          eyebrow={t('contact.eyebrow')}
+          title={t('contact.title')}
+          lead={t('contact.lead')}
         />
 
         <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {channels.map(({ label, value, href, Icon, external }, i) => (
-            <motion.a
+            <m.a
               key={label}
               href={href}
               {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
@@ -77,16 +50,16 @@ export default function Contact() {
                 </span>
                 <div>
                   <p className="text-xs uppercase tracking-[0.16em] text-faint">{label}</p>
-                  <p className="mt-1 font-display font-semibold tracking-tight text-ink">
+                  <p className="mt-1 font-display font-semibold tracking-tight text-ink" dir="ltr">
                     {value}
                   </p>
                 </div>
               </div>
               <ArrowUpRight
                 size={20}
-                className="text-faint transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-gold"
+                className="text-faint transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-gold rtl:-scale-x-100"
               />
-            </motion.a>
+            </m.a>
           ))}
         </div>
       </div>

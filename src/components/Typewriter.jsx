@@ -48,9 +48,9 @@ function Typewriter({ words, className = '' }) {
 
   return (
     <span className={className}>
-      <span className="text-gradient-gold">{text}</span>
+      <span className="font-semibold text-gold">{text}</span>
       {!reduce && (
-        <span className="ml-0.5 inline-block w-[2px] animate-caret-blink bg-gold align-middle" style={{ height: '1em' }} />
+        <span className="ms-0.5 inline-block w-[2px] animate-caret-blink bg-gold align-middle" style={{ height: '1em' }} />
       )}
     </span>
   );

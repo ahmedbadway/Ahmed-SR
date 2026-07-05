@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { List, X, PenNib } from '@phosphor-icons/react';
 import { scrollToId } from '../utils/scrollToId.js';
 import { getLenis } from '../utils/lenis.js';
 import { navigate } from '../hooks/useHashRoute.js';
+import { useLang } from '../i18n/LanguageProvider.jsx';
+import Logo from './Logo.jsx';
+import LanguageToggle from './LanguageToggle.jsx';
 
 const links = [
-  { id: 'about', label: 'About' },
-  { id: 'projects', label: 'Work' },
-  { id: 'skills', label: 'Skills' },
+  { id: 'about', key: 'nav.about' },
+  { id: 'projects', key: 'nav.work' },
+  { id: 'skills', key: 'nav.skills' },
 ];
 
 export default function Navbar({ route = '/' }) {
+  const { t } = useLang();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const onHome = route === '/';
@@ -54,7 +58,7 @@ export default function Navbar({ route = '/' }) {
   };
 
   return (
-    <motion.header
+    <m.header
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
@@ -67,9 +71,9 @@ export default function Navbar({ route = '/' }) {
       >
         <button
           onClick={() => (onHome ? go('main') : navigate('/'))}
-          className="font-display text-base font-bold tracking-tightest text-ink"
+          aria-label={t('nav.home')}
         >
-          AB<span className="text-gold">.</span>
+          <Logo />
         </button>
 
         {/* Desktop links */}
@@ -81,7 +85,7 @@ export default function Navbar({ route = '/' }) {
               onClick={() => go(l.id)}
               className="text-sm text-muted transition-colors hover:text-ink"
             >
-              {l.label}
+              {t(l.key)}
             </button>
           ))}
           <button
@@ -89,7 +93,7 @@ export default function Navbar({ route = '/' }) {
             onClick={() => go('contact')}
             className="text-sm text-muted transition-colors hover:text-ink"
           >
-            Contact
+            {t('nav.contact')}
           </button>
           <button
             data-magnetic
@@ -101,25 +105,29 @@ export default function Navbar({ route = '/' }) {
             }`}
           >
             <PenNib size={16} weight="fill" />
-            Build a Design
+            {t('nav.build')}
           </button>
+          <LanguageToggle />
         </div>
 
-        {/* Mobile trigger */}
-        <button
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="grid h-10 w-10 place-items-center rounded-full border border-line text-ink md:hidden"
-        >
-          {open ? <X size={20} /> : <List size={20} />}
-        </button>
+        {/* Mobile trigger + language */}
+        <div className="flex items-center gap-2 md:hidden">
+          <LanguageToggle />
+          <button
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="grid h-10 w-10 place-items-center rounded-full border border-line text-ink"
+          >
+            {open ? <X size={20} /> : <List size={20} />}
+          </button>
+        </div>
       </nav>
 
       {/* Mobile sheet */}
       <AnimatePresence>
         {open ? (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
@@ -127,26 +135,26 @@ export default function Navbar({ route = '/' }) {
             className="shell md:hidden"
           >
             <div className="glass mt-2 flex flex-col gap-1 rounded-card p-3">
-              {[...links, { id: 'contact', label: 'Contact' }].map((l) => (
+              {[...links, { id: 'contact', key: 'nav.contact' }].map((l) => (
                 <button
                   key={l.id}
                   onClick={() => go(l.id)}
-                  className="rounded-xl px-4 py-3 text-left text-lg text-ink transition-colors hover:bg-surface-2"
+                  className="rounded-xl px-4 py-3 text-start text-lg text-ink transition-colors hover:bg-surface-2"
                 >
-                  {l.label}
+                  {t(l.key)}
                 </button>
               ))}
               <button
                 onClick={goBuild}
-                className="mt-1 flex items-center gap-2 rounded-xl bg-gold px-4 py-3 text-left text-lg font-semibold text-bg transition-colors hover:bg-gold-soft"
+                className="mt-1 flex items-center gap-2 rounded-xl bg-gold px-4 py-3 text-start text-lg font-semibold text-bg transition-colors hover:bg-gold-soft"
               >
                 <PenNib size={19} weight="fill" />
-                Build a Design
+                {t('nav.build')}
               </button>
             </div>
-          </motion.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
-    </motion.header>
+    </m.header>
   );
 }
