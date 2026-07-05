@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { motion, useMotionValue, useSpring, useReducedMotion } from 'framer-motion';
+import { m, useMotionValue, useSpring, useReducedMotion } from 'framer-motion';
 
 // Wraps children so they drift toward the pointer on hover, then spring back.
 // Uses motion values (no useState) per the pointer-physics rule.
@@ -40,7 +40,7 @@ export default function Magnetic({ children, strength = 0.35, className = '' }) 
   };
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       onPointerEnter={handleEnter}
       onPointerMove={handleMove}
@@ -49,6 +49,6 @@ export default function Magnetic({ children, strength = 0.35, className = '' }) 
       className={`inline-block ${className}`}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

@@ -1,23 +1,11 @@
 import { useRef } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import { m, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { ArrowDown, ArrowUpRight } from '@phosphor-icons/react';
 import Magnetic from './Magnetic.jsx';
 import Typewriter from './Typewriter.jsx';
 import { scrollToId } from '../utils/scrollToId.js';
 import { navigate } from '../hooks/useHashRoute.js';
-
-const NAME = 'AHMED BADWAY';
-
-// Stable module-level reference so it never becomes a "new" prop identity on a
-// Hero re-render — that would restart Typewriter's typing effect needlessly.
-// These are the *kinds of work* Ahmed ships (outcomes), not a tech-skill list —
-// a skills carousel reads as a template; naming the deliverable reads as a pro.
-const TYPEWRITER_WORDS = [
-  'e-commerce stores',
-  'clinic websites',
-  'brand landings',
-  'portfolios',
-];
+import { useLang } from '../i18n/LanguageProvider.jsx';
 
 // Per-character reveal for the name (0.08s stagger). Reduced-motion visitors
 // get a single soft fade with no vertical travel — see `charReduced` below.
@@ -39,9 +27,6 @@ const charReduced = {
 };
 
 // Deterministic-ish particle field (avoids layout cost of many state updates).
-// Kept intentionally small: each particle is a separately composited layer
-// running an infinite float animation that keeps ticking even while the Hero
-// is scrolled off-screen, so the count is a permanent background GPU cost.
 const particles = Array.from({ length: 6 }, (_, i) => ({
   id: i,
   left: (i * 61.8) % 100,
@@ -54,6 +39,8 @@ const particles = Array.from({ length: 6 }, (_, i) => ({
 export default function Hero() {
   const ref = useRef(null);
   const reduce = useReducedMotion();
+  const { t, lang } = useLang();
+  const isAr = lang === 'ar';
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start start', 'end start'],
@@ -62,20 +49,18 @@ export default function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
   const char = reduce ? charReduced : charMotion;
 
+  const name = t('hero.name');
+
   return (
     <section
       ref={ref}
       className="relative flex min-h-[100dvh] items-center overflow-hidden pt-24"
     >
-      {/* Bold gold orb drifting behind the name. Centering lives on the
-          wrapper so framer's x/y transforms (the drift) don't fight it. */}
+      {/* Bold gold orb drifting behind the name. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
       >
-        {/* CSS keyframe drift (see `orb-drift` in tailwind.config.js) instead of
-            Framer's x/y/scale shorthand — runs on the compositor thread
-            rather than being ticked via rAF on the main thread. */}
         <div
           className={`h-[min(900px,100vw)] w-[min(900px,100vw)] rounded-full ${
             reduce ? '' : 'animate-orb-drift'
@@ -109,47 +94,57 @@ export default function Hero() {
         </div>
       )}
 
-      <motion.div style={{ y: yContent, opacity }} className="shell relative z-10">
-        <motion.span
+      <m.div style={{ y: yContent, opacity }} className="shell relative z-10">
+        <m.span
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.05 }}
           className="eyebrow"
         >
-          Frontend Developer · Mansoura, Egypt
-        </motion.span>
+          {t('hero.eyebrow')}
+        </m.span>
 
-        <motion.h1
+        <m.h1
           variants={container}
           initial="hidden"
           animate="show"
-          aria-label={NAME}
+          aria-label={name}
           className="mt-6 font-display text-[clamp(2.75rem,11vw,9.5rem)] font-extrabold leading-[0.92] tracking-tightest text-ink"
         >
-          {NAME.split(' ').map((word, wi) => (
-            <span key={wi} className="mr-[0.18em] inline-block whitespace-nowrap">
-              {word.split('').map((c, i) => (
-                <span key={i} className="inline-block overflow-hidden align-bottom">
-                  <motion.span variants={char} className="inline-block">
-                    {c}
-                  </motion.span>
+          {name.split(' ').map((word, wi) => (
+            <span key={wi} className="me-[0.18em] inline-block whitespace-nowrap">
+              {isAr ? (
+                // Arabic letters connect — animate the whole word as one unit so
+                // ligatures are preserved (per-character would isolate each form).
+                <span className="inline-block overflow-hidden align-bottom">
+                  <m.span variants={char} className="inline-block">
+                    {word}
+                  </m.span>
                 </span>
-              ))}
+              ) : (
+                word.split('').map((c, i) => (
+                  <span key={i} className="inline-block overflow-hidden align-bottom">
+                    <m.span variants={char} className="inline-block">
+                      {c}
+                    </m.span>
+                  </span>
+                ))
+              )}
             </span>
           ))}
-        </motion.h1>
+        </m.h1>
 
-        <motion.p
+        <m.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
           className="mt-7 max-w-[52ch] font-mono text-sm text-muted sm:text-base md:text-lg"
         >
-          I design &amp; build premium{' '}
-          <Typewriter words={TYPEWRITER_WORDS} />
-        </motion.p>
+          {t('hero.leadPrefix')}{' '}
+          <Typewriter words={t('hero.words')} />
+        </m.p>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 1.4, ease: [0.16, 1, 0.3, 1] }}
@@ -160,7 +155,7 @@ export default function Hero() {
               onClick={() => scrollToId('projects')}
               className="group flex items-center gap-2 rounded-full bg-gold px-7 py-3.5 font-semibold text-bg transition-colors duration-200 hover:bg-gold-soft active:scale-[0.98]"
             >
-              View Work
+              {t('hero.viewWork')}
               <ArrowDown
                 size={18}
                 weight="bold"
@@ -173,11 +168,11 @@ export default function Hero() {
               onClick={() => scrollToId('contact')}
               className="group flex items-center gap-2 rounded-full border border-line px-7 py-3.5 font-semibold text-ink transition-colors duration-200 hover:border-gold active:scale-[0.98]"
             >
-              Contact
+              {t('hero.contact')}
               <ArrowUpRight
                 size={18}
                 weight="bold"
-                className="text-gold transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                className="text-gold transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:-scale-x-100"
               />
             </button>
           </Magnetic>
@@ -187,31 +182,33 @@ export default function Hero() {
             data-magnetic
             className="group inline-flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-gold"
           >
-            Or build your design
+            {t('hero.orBuild')}
             <ArrowUpRight
               size={15}
               weight="bold"
-              className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:-scale-x-100"
             />
           </button>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
 
       {/* Scroll cue */}
       {!reduce && (
-        <motion.div
+        <m.div
           style={{ opacity }}
           className="absolute inset-x-0 bottom-8 flex justify-center"
         >
-          <motion.div
+          <m.div
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
             className="flex flex-col items-center gap-2 text-faint"
           >
-            <span className="text-[0.7rem] uppercase tracking-[0.2em]">Scroll</span>
+            <span className="text-[0.7rem] uppercase tracking-[0.2em]">
+              {t('hero.scroll')}
+            </span>
             <ArrowDown size={16} />
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </section>
   );

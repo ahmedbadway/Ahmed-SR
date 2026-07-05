@@ -41,6 +41,19 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Apply the stored language/direction before React mounts so returning
+         Arabic visitors never see a left-to-right flash. -->
+    <script>
+      (function () {
+        try {
+          var l = localStorage.getItem('ab-lang');
+          if (l === 'ar') {
+            document.documentElement.lang = 'ar';
+            document.documentElement.dir = 'rtl';
+          }
+        } catch (e) {}
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
