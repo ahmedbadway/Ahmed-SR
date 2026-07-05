@@ -48,8 +48,10 @@ test.describe('project fan carousel', () => {
     await expect(section.getByRole('link', { name: /Live Site/i })).toBeVisible();
   });
 
-  test('the Next arrow advances the fan and updates the details panel', async ({ page }) => {
+  test('the Next arrow advances the fan (hover-capable devices)', async ({ page }) => {
     await page.goto('/');
+    test.skip(!(await canHover(page)), 'no hover pointer — fan swipes instead of arrows');
+
     const section = page.locator('#projects');
     await section.scrollIntoViewIfNeeded();
     await page.waitForTimeout(2200); // let the entry animation settle (worst case ~1.76s)
@@ -61,14 +63,68 @@ test.describe('project fan carousel', () => {
       .not.toBe(nameBefore);
   });
 
-  test('the Previous arrow cycles the fan backwards', async ({ page }) => {
+  test('the Previous arrow cycles the fan backwards (hover-capable devices)', async ({ page }) => {
     await page.goto('/');
+    test.skip(!(await canHover(page)), 'no hover pointer — fan swipes instead of arrows');
+
     const section = page.locator('#projects');
     await section.scrollIntoViewIfNeeded();
     await page.waitForTimeout(2200);
 
     const nameBefore = await section.locator('h3').first().textContent();
     await section.getByRole('button', { name: 'Previous' }).click();
+    await expect
+      .poll(async () => section.locator('h3').first().textContent())
+      .not.toBe(nameBefore);
+  });
+
+  test('shows no arrow buttons on touch devices', async ({ page }) => {
+    await page.goto('/');
+    test.skip(await canHover(page), 'hover pointer — fan uses arrow buttons instead');
+
+    const section = page.locator('#projects');
+    await section.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(2200);
+
+    await expect(section.getByRole('button', { name: /Previous|Next/ })).toHaveCount(0);
+  });
+
+  test('a swipe gesture advances the fan (touch devices)', async ({ page }) => {
+    await page.goto('/');
+    test.skip(await canHover(page), 'hover pointer — fan uses arrow buttons instead');
+
+    const section = page.locator('#projects');
+    await section.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(2200);
+
+    const nameBefore = await section.locator('h3').first().textContent();
+    // Dispatch touch-typed PointerEvents directly rather than page.mouse
+    // (which emulates an actual mouse and would itself flip Chromium's
+    // dynamic hover-capability detection — not something a real touch-only
+    // visitor's browser would ever do).
+    await page.evaluate(() => {
+      const el = document.querySelector('.fan-layout');
+      const rect = el.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      const startX = rect.left + rect.width * 0.75;
+      const endX = rect.left + rect.width * 0.25;
+      const fire = (type, x, y) =>
+        el.dispatchEvent(
+          new PointerEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            pointerId: 1,
+            pointerType: 'touch',
+            clientX: x,
+            clientY: y,
+            isPrimary: true,
+          })
+        );
+      fire('pointerdown', startX, midY);
+      for (let i = 1; i <= 6; i++) fire('pointermove', startX + ((endX - startX) * i) / 6, midY);
+      fire('pointerup', endX, midY);
+    });
+
     await expect
       .poll(async () => section.locator('h3').first().textContent())
       .not.toBe(nameBefore);

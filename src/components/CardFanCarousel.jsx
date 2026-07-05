@@ -1,24 +1,21 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import gsap from 'gsap';
+import { useHoverCapable } from '../hooks/useHoverCapable.js';
 
-const MAX_VISIBLE = 7;
-const HALF = 3;
+export const MAX_VISIBLE = 3;
+export const HALF = 1;
 
 const FAN_POSITIONS = [
-  { rot: -21, scale: 0.7756, x: -30, y: 7.3, zIndex: 1 },
-  { rot: -14, scale: 0.8498, x: -22, y: 4.0, zIndex: 2 },
-  { rot: -7, scale: 0.9346, x: -11, y: 1.3, zIndex: 3 },
+  { rot: -13, scale: 0.85, x: -16, y: 3.2, zIndex: 1 },
   { rot: 0, scale: 1.0, x: 0, y: 0.0, zIndex: 10 },
-  { rot: 7, scale: 0.9346, x: 11, y: 1.3, zIndex: 3 },
-  { rot: 14, scale: 0.8498, x: 22, y: 4.0, zIndex: 2 },
-  { rot: 21, scale: 0.7756, x: 30, y: 7.3, zIndex: 1 },
+  { rot: 13, scale: 0.85, x: 16, y: 3.2, zIndex: 1 },
 ];
 
 function getResponsiveMultiplier(width) {
-  if (width < 480) return 0.28;
-  if (width < 640) return 0.38;
-  if (width < 768) return 0.5;
-  if (width < 1024) return 0.75;
+  if (width < 480) return 0.45;
+  if (width < 640) return 0.55;
+  if (width < 768) return 0.7;
+  if (width < 1024) return 0.85;
   return 1.0;
 }
 
@@ -27,11 +24,11 @@ function getResponsiveMultiplier(width) {
 // heights in index.css).
 function getHeightMultiplier(width) {
   let idealPx;
-  if (width < 480) idealPx = 22 * 16;
-  else if (width < 640) idealPx = 26 * 16;
-  else if (width < 768) idealPx = 28 * 16;
-  else if (width < 1024) idealPx = 34 * 16;
-  else idealPx = 38 * 16;
+  if (width < 480) idealPx = 20 * 16;
+  else if (width < 640) idealPx = 23 * 16;
+  else if (width < 768) idealPx = 26 * 16;
+  else if (width < 1024) idealPx = 32 * 16;
+  else idealPx = 36 * 16;
 
   const available = window.innerHeight * 0.7;
   if (available >= idealPx) return 1;
@@ -44,10 +41,10 @@ function getSlotConfig(totalCards, slot) {
   const distance = totalCards > 1 ? (slot - center) / center : 0;
   const absDistance = Math.abs(distance);
   return {
-    rot: distance * 21,
-    scale: 1.0 - 0.2244 * absDistance * absDistance,
-    x: distance * 30,
-    y: absDistance * absDistance * 7.3,
+    rot: distance * 13,
+    scale: 1.0 - 0.15 * absDistance * absDistance,
+    x: distance * 16,
+    y: absDistance * absDistance * 3.2,
     zIndex: 10 - Math.abs(slot - center),
   };
 }
@@ -55,10 +52,12 @@ function getSlotConfig(totalCards, slot) {
 const ARROW_CLASSES =
   "relative flex items-center justify-center rounded-full border border-line bg-surface text-faint cursor-pointer shrink-0 z-30 outline-none shadow-[0_4px_20px_-4px_oklch(0_0_0_/_0.6)] hover:border-gold/50 hover:text-gold active:opacity-70 transition-colors duration-200";
 
-// Card-fan carousel: up to 7 cards spread in a hand-of-cards arc; extra cards
-// page in via the arrows, swapping the trailing edge card for the next one.
-// Reports the centered card's index to the parent (via onCenterChange) so a
-// details panel elsewhere on the page can stay in sync with the fan.
+// Card-fan carousel: 3 cards spread in a hand-of-cards arc; extra cards page
+// in one at a time from the trailing edge. Hover-capable pointers get arrow
+// buttons; touch devices swipe the fan left/right instead (no reliable
+// hover, and a drag reads more naturally on a phone than tapping a small
+// arrow). Reports the centered card's index to the parent (via
+// onCenterChange) so a details panel elsewhere on the page stays in sync.
 export default function CardFanCarousel({ cards, initialIndex, onCenterChange }) {
   const containerRef = useRef(null);
   const isAnimating = useRef(false);
@@ -67,6 +66,7 @@ export default function CardFanCarousel({ cards, initialIndex, onCenterChange })
   const prevVisible = useRef(new Set());
   const onCenterChangeRef = useRef(onCenterChange);
   onCenterChangeRef.current = onCenterChange;
+  const canHover = useHoverCapable();
 
   const totalCards = cards.length;
   const needsPagination = totalCards > MAX_VISIBLE;
@@ -203,6 +203,40 @@ export default function CardFanCarousel({ cards, initialIndex, onCenterChange })
     onCenterChangeRef.current?.(centerRef.current);
   };
 
+  // Touch-only swipe: a real drag (past a small threshold) cycles the fan
+  // and suppresses the card <a>'s click so a swipe never also fires a
+  // navigation; a short tap with no meaningful movement still opens the link.
+  const dragStartX = useRef(0);
+  const dragMoved = useRef(false);
+  const suppressNextClick = useRef(false);
+  const DRAG_THRESHOLD = 40;
+
+  const onPointerDown = (e) => {
+    if (canHover) return;
+    dragStartX.current = e.clientX;
+    dragMoved.current = false;
+  };
+  const onPointerMove = (e) => {
+    if (canHover || dragStartX.current === 0) return;
+    if (Math.abs(e.clientX - dragStartX.current) > 8) dragMoved.current = true;
+  };
+  const onPointerUp = (e) => {
+    if (canHover) return;
+    const delta = e.clientX - dragStartX.current;
+    dragStartX.current = 0;
+    if (Math.abs(delta) >= DRAG_THRESHOLD) {
+      suppressNextClick.current = true;
+      cycle(delta < 0 ? 'right' : 'left');
+    }
+    dragMoved.current = false;
+  };
+  const onClickCapture = (e) => {
+    if (suppressNextClick.current) {
+      e.preventDefault();
+      suppressNextClick.current = false;
+    }
+  };
+
   if (!totalCards) return null;
 
   // `flex` reverses the arrows' screen position under dir="rtl" automatically,
@@ -226,7 +260,14 @@ export default function CardFanCarousel({ cards, initialIndex, onCenterChange })
   return (
     <div className="flex flex-col items-center w-full">
       <div className="flex items-center justify-center w-full max-w-[90rem]">
-        <div ref={containerRef} className="fan-layout flex relative justify-center items-center w-full max-w-[80rem]">
+        <div
+          ref={containerRef}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onClickCapture={onClickCapture}
+          className="fan-layout flex relative justify-center items-center w-full max-w-[80rem] touch-pan-y"
+        >
           {cards.map((card, index) => (
             <a
               key={index}
@@ -241,6 +282,7 @@ export default function CardFanCarousel({ cards, initialIndex, onCenterChange })
                 decoding="async"
                 alt={card.alt || `Card ${index}`}
                 className="absolute inset-0 h-full w-full object-cover object-top"
+                draggable={false}
               />
             </a>
           ))}
@@ -249,13 +291,15 @@ export default function CardFanCarousel({ cards, initialIndex, onCenterChange })
 
       {needsPagination ? (
         <div className="mt-6 flex items-center justify-center gap-4 md:mt-8">
-          <button
-            className={`${ARROW_CLASSES} h-10 w-10 md:h-12 md:w-12`}
-            onClick={() => cycle('left')}
-            aria-label="Previous"
-          >
-            {chevron('left')}
-          </button>
+          {canHover ? (
+            <button
+              className={`${ARROW_CLASSES} h-10 w-10 md:h-12 md:w-12`}
+              onClick={() => cycle('left')}
+              aria-label="Previous"
+            >
+              {chevron('left')}
+            </button>
+          ) : null}
           <div className="flex items-center gap-2">
             {cards.map((_, i) => (
               <span
@@ -266,13 +310,15 @@ export default function CardFanCarousel({ cards, initialIndex, onCenterChange })
               />
             ))}
           </div>
-          <button
-            className={`${ARROW_CLASSES} h-10 w-10 md:h-12 md:w-12`}
-            onClick={() => cycle('right')}
-            aria-label="Next"
-          >
-            {chevron('right')}
-          </button>
+          {canHover ? (
+            <button
+              className={`${ARROW_CLASSES} h-10 w-10 md:h-12 md:w-12`}
+              onClick={() => cycle('right')}
+              aria-label="Next"
+            >
+              {chevron('right')}
+            </button>
+          ) : null}
         </div>
       ) : null}
     </div>
