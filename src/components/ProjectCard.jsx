@@ -1,25 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import { useLang } from '../i18n/LanguageProvider.jsx';
-
-// True only on devices with a real hover-capable pointer (desktop mouse/trackpad).
-// Touch phones and tablets report `hover: none` — there the flip-on-hover
-// interaction is unreliable, so those visitors get the full stacked card with
-// every detail visible up front instead of a tap-to-reveal they might miss.
-function useHoverCapable() {
-  const query = '(hover: hover) and (pointer: fine)';
-  const [canHover, setCanHover] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia(query).matches
-  );
-  useEffect(() => {
-    const mq = window.matchMedia(query);
-    const onChange = () => setCanHover(mq.matches);
-    mq.addEventListener?.('change', onChange);
-    return () => mq.removeEventListener?.('change', onChange);
-  }, []);
-  return canHover;
-}
+import { useHoverCapable } from '../hooks/useHoverCapable.js';
 
 function initials(name) {
   return name

@@ -8,6 +8,7 @@ import Projects from './components/Projects.jsx';
 import Skills from './components/Skills.jsx';
 import Contact from './components/Contact.jsx';
 import Footer from './components/Footer.jsx';
+import FloatingBuildCta from './components/FloatingBuildCta.jsx';
 import { useSmoothScroll } from './hooks/useSmoothScroll.js';
 import { useHashRoute } from './hooks/useHashRoute.js';
 import { useLang } from './i18n/LanguageProvider.jsx';
@@ -61,6 +62,7 @@ export default function App() {
       </main>
 
       <Footer />
+      <FloatingBuildCta route={route} />
     </LazyMotion>
   );
 }
