@@ -37,45 +37,41 @@ test.describe('page shell', () => {
   });
 });
 
-test.describe('project cards', () => {
-  test('flip to reveal details on hover (hover-capable devices)', async ({ page }) => {
+test.describe('project fan carousel', () => {
+  test('renders every project card and a details panel for the centered one', async ({ page }) => {
     await page.goto('/');
-    test.skip(!(await canHover(page)), 'no hover pointer — card flips on tap instead');
+    const section = page.locator('#projects');
+    await section.scrollIntoViewIfNeeded();
 
-    const card = page.locator('#projects article').first();
-    await card.scrollIntoViewIfNeeded();
-
-    const inner = card.locator('> div');
-    const before = await inner.evaluate((el) => getComputedStyle(el).transform);
-    await card.hover();
-    // Wait for the 0.6s flip transition to move the transform off identity.
-    await expect
-      .poll(async () => inner.evaluate((el) => getComputedStyle(el).transform))
-      .not.toBe(before);
+    await expect(section.locator('.fan-card')).toHaveCount(8);
+    await expect(section.locator('h3').first()).toBeVisible();
+    await expect(section.getByRole('link', { name: /Live Site/i })).toBeVisible();
   });
 
-  test('flip to reveal details on tap (touch devices)', async ({ page }) => {
+  test('the Next arrow advances the fan and updates the details panel', async ({ page }) => {
     await page.goto('/');
-    test.skip(await canHover(page), 'hover pointer — card flips on hover instead');
+    const section = page.locator('#projects');
+    await section.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(2200); // let the entry animation settle (worst case ~1.76s)
 
-    const card = page.locator('#projects article').first();
-    await card.scrollIntoViewIfNeeded();
-
-    const inner = card.locator('> div');
-    const before = await inner.evaluate((el) => getComputedStyle(el).transform);
-    await card.tap();
-    // Wait for the 0.6s flip transition to finish and settle on the fully
-    // rotated matrix (poll until two consecutive reads agree).
+    const nameBefore = await section.locator('h3').first().textContent();
+    await section.getByRole('button', { name: 'Next' }).click();
     await expect
-      .poll(async () => inner.evaluate((el) => getComputedStyle(el).transform))
-      .not.toBe(before);
-    await page.waitForTimeout(700);
-    const after = await inner.evaluate((el) => getComputedStyle(el).transform);
+      .poll(async () => section.locator('h3').first().textContent())
+      .not.toBe(nameBefore);
+  });
 
-    // Tapping the Live Site link on the flipped-open back face must not
-    // toggle the flip back — it should only follow the link.
-    await card.getByRole('link').first().tap({ trial: true });
-    expect(await inner.evaluate((el) => getComputedStyle(el).transform)).toBe(after);
+  test('the Previous arrow cycles the fan backwards', async ({ page }) => {
+    await page.goto('/');
+    const section = page.locator('#projects');
+    await section.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(2200);
+
+    const nameBefore = await section.locator('h3').first().textContent();
+    await section.getByRole('button', { name: 'Previous' }).click();
+    await expect
+      .poll(async () => section.locator('h3').first().textContent())
+      .not.toBe(nameBefore);
   });
 });
 

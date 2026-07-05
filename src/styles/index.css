@@ -192,3 +192,51 @@ html[dir='rtl'] .tracking-tightest {
   mix-blend-mode: soft-light;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+
+/* Card-fan carousel (Projects). Breakpoints (480/640/768/1024) match
+   CardFanCarousel.jsx's own getResponsiveMultiplier/getHeightMultiplier — the
+   container height and card width here must stay in lockstep with the JS or
+   the GSAP-driven fan math and the CSS box it animates inside will disagree.
+   Cards are centered via `margin: auto`, not a transform, so GSAP's
+   x/y/rotate/scale (also transforms) compose cleanly on top instead of
+   overwriting a centering transform. */
+.fan-layout {
+  position: relative;
+  height: 22rem;
+}
+@media (min-width: 480px) {
+  .fan-layout { height: 26rem; }
+}
+@media (min-width: 640px) {
+  .fan-layout { height: 28rem; }
+}
+@media (min-width: 768px) {
+  .fan-layout { height: 34rem; }
+}
+@media (min-width: 1024px) {
+  .fan-layout { height: 38rem; }
+}
+
+.fan-card {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 11rem;
+  aspect-ratio: 16 / 10;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 60px -32px oklch(0 0 0 / 0.8);
+  will-change: transform;
+}
+@media (min-width: 480px) {
+  .fan-card { width: 13rem; }
+}
+@media (min-width: 640px) {
+  .fan-card { width: 15rem; }
+}
+@media (min-width: 768px) {
+  .fan-card { width: 18rem; }
+}
+@media (min-width: 1024px) {
+  .fan-card { width: 21rem; }
+}
