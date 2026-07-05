@@ -9,6 +9,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "images:optimize": "node scripts/optimizeImages.mjs"
@@ -25,6 +28,8 @@
     "@fontsource/inter": "^5.1.0",
     "@fontsource/jetbrains-mono": "^5.1.1",
     "@fontsource/sora": "^5.1.0",
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.0",
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
