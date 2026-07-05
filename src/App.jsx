@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
-import VideoBackground from './components/VideoBackground.jsx';
+import ParticleField from './components/ParticleField.jsx';
 import Navbar from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx';
 import About from './components/About.jsx';
@@ -33,7 +33,7 @@ export default function App() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <VideoBackground />
+      <ParticleField />
 
       <a
         href="#main"
