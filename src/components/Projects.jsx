@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import SectionHeading from './SectionHeading.jsx';
-import CardFanCarousel from './CardFanCarousel.jsx';
+import CardFanCarousel, { MAX_VISIBLE, HALF } from './CardFanCarousel.jsx';
 import { projects } from '../data/projects.js';
 import { useLang } from '../i18n/LanguageProvider.jsx';
 
-const DEFAULT_INDEX = projects.length > 7 ? 3 : projects.length >> 1;
+const DEFAULT_INDEX = projects.length > MAX_VISIBLE ? HALF : projects.length >> 1;
 
 export default function Projects() {
   const { t, lang } = useLang();

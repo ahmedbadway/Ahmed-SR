@@ -202,26 +202,26 @@ html[dir='rtl'] .tracking-tightest {
    overwriting a centering transform. */
 .fan-layout {
   position: relative;
-  height: 22rem;
+  height: 20rem;
 }
 @media (min-width: 480px) {
-  .fan-layout { height: 26rem; }
+  .fan-layout { height: 23rem; }
 }
 @media (min-width: 640px) {
-  .fan-layout { height: 28rem; }
+  .fan-layout { height: 26rem; }
 }
 @media (min-width: 768px) {
-  .fan-layout { height: 34rem; }
+  .fan-layout { height: 32rem; }
 }
 @media (min-width: 1024px) {
-  .fan-layout { height: 38rem; }
+  .fan-layout { height: 36rem; }
 }
 
 .fan-card {
   position: absolute;
   inset: 0;
   margin: auto;
-  width: 11rem;
+  width: 12rem;
   aspect-ratio: 16 / 10;
   border-radius: 16px;
   border: 1px solid var(--border);
@@ -229,14 +229,14 @@ html[dir='rtl'] .tracking-tightest {
   will-change: transform;
 }
 @media (min-width: 480px) {
-  .fan-card { width: 13rem; }
-}
-@media (min-width: 640px) {
   .fan-card { width: 15rem; }
 }
+@media (min-width: 640px) {
+  .fan-card { width: 19rem; }
+}
 @media (min-width: 768px) {
-  .fan-card { width: 18rem; }
+  .fan-card { width: 24rem; }
 }
 @media (min-width: 1024px) {
-  .fan-card { width: 21rem; }
+  .fan-card { width: 28rem; }
 }
