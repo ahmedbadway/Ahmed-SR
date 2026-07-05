@@ -121,9 +121,9 @@ export default function ProjectCard({ project }) {
     },
   };
 
-  // Flip is a desktop-hover delight only. Touch devices and reduced-motion
-  // visitors get the stacked layout below with all details always visible.
-  const useFlip = !reduce && canHover;
+  // Every visitor except reduced-motion gets the flip; only the trigger
+  // changes — hover on desktop, tap on touch (no reliable hover there).
+  const useFlip = !reduce;
 
   if (!useFlip) {
     return (
@@ -142,12 +142,17 @@ export default function ProjectCard({ project }) {
     );
   }
 
-  // Hover-only flip: this branch runs solely on hover-capable pointers, so a
-  // plain enter/leave is all that's needed — no pointer-type bookkeeping.
-  const flipHandlers = {
-    onPointerEnter: () => setFlipped(true),
-    onPointerLeave: () => setFlipped(false),
-  };
+  // Desktop flips on hover; touch has no reliable hover state, so it flips
+  // on tap instead (the anchor inside the back face stops its own clicks
+  // from propagating here, so tapping the Live Site link never re-flips).
+  const flipHandlers = canHover
+    ? {
+        onPointerEnter: () => setFlipped(true),
+        onPointerLeave: () => setFlipped(false),
+      }
+    : {
+        onClick: () => setFlipped((f) => !f),
+      };
 
   // backdrop-filter would collapse preserve-3d, so inline the glass look here.
   const faceBase = {
@@ -190,7 +195,7 @@ export default function ProjectCard({ project }) {
               </h3>
             </div>
             <span className="shrink-0 rounded-full border border-line bg-bg/50 px-3 py-1 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-faint">
-              {t('projects.hover')}
+              {canHover ? t('projects.hover') : t('projects.tap')}
             </span>
           </div>
         </div>

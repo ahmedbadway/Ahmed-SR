@@ -40,7 +40,7 @@ test.describe('page shell', () => {
 test.describe('project cards', () => {
   test('flip to reveal details on hover (hover-capable devices)', async ({ page }) => {
     await page.goto('/');
-    test.skip(!(await canHover(page)), 'no hover pointer — card uses the stacked layout');
+    test.skip(!(await canHover(page)), 'no hover pointer — card flips on tap instead');
 
     const card = page.locator('#projects article').first();
     await card.scrollIntoViewIfNeeded();
@@ -54,16 +54,28 @@ test.describe('project cards', () => {
       .not.toBe(before);
   });
 
-  test('show the full stacked card with details up front (touch devices)', async ({ page }) => {
+  test('flip to reveal details on tap (touch devices)', async ({ page }) => {
     await page.goto('/');
-    test.skip(await canHover(page), 'hover pointer — card uses the flip layout');
+    test.skip(await canHover(page), 'hover pointer — card flips on hover instead');
 
     const card = page.locator('#projects article').first();
     await card.scrollIntoViewIfNeeded();
 
-    // No flip on touch: the Live link and tech tags are visible with no tap.
-    await expect(card.getByRole('link').first()).toBeVisible();
-    await expect(card.locator('ul li').first()).toBeVisible();
+    const inner = card.locator('> div');
+    const before = await inner.evaluate((el) => getComputedStyle(el).transform);
+    await card.tap();
+    // Wait for the 0.6s flip transition to finish and settle on the fully
+    // rotated matrix (poll until two consecutive reads agree).
+    await expect
+      .poll(async () => inner.evaluate((el) => getComputedStyle(el).transform))
+      .not.toBe(before);
+    await page.waitForTimeout(700);
+    const after = await inner.evaluate((el) => getComputedStyle(el).transform);
+
+    // Tapping the Live Site link on the flipped-open back face must not
+    // toggle the flip back — it should only follow the link.
+    await card.getByRole('link').first().tap({ trial: true });
+    expect(await inner.evaluate((el) => getComputedStyle(el).transform)).toBe(after);
   });
 });
 
