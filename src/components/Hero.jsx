@@ -26,16 +26,6 @@ const charReduced = {
   show: { opacity: 1, transition: { duration: 0.4 } },
 };
 
-// Deterministic-ish particle field (avoids layout cost of many state updates).
-const particles = Array.from({ length: 6 }, (_, i) => ({
-  id: i,
-  left: (i * 61.8) % 100,
-  top: (i * 37.5) % 100,
-  size: 2 + (i % 3),
-  delay: (i % 7) * 0.9,
-  duration: 6 + (i % 5),
-}));
-
 export default function Hero() {
   const ref = useRef(null);
   const reduce = useReducedMotion();
@@ -73,26 +63,6 @@ export default function Hero() {
           }}
         />
       </div>
-
-      {/* Floating particles */}
-      {!reduce && (
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          {particles.map((p) => (
-            <span
-              key={p.id}
-              className="absolute animate-float rounded-full bg-gold/40"
-              style={{
-                left: `${p.left}%`,
-                top: `${p.top}%`,
-                width: p.size,
-                height: p.size,
-                animationDelay: `${p.delay}s`,
-                animationDuration: `${p.duration}s`,
-              }}
-            />
-          ))}
-        </div>
-      )}
 
       <m.div style={{ y: yContent, opacity }} className="shell relative z-10">
         <m.span
