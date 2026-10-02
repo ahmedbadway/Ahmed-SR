@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
-import GradientMesh from './components/GradientMesh.jsx';
 import Navbar from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx';
 import About from './components/About.jsx';
@@ -34,8 +33,6 @@ export default function App() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <GradientMesh />
-
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-gold focus:px-4 focus:py-2 focus:font-medium focus:text-bg"

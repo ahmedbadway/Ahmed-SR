@@ -40,15 +40,6 @@ export default {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
         },
-        'gradient-pan': {
-          '0%, 100%': { transform: 'translate3d(0,0,0) scale(1)' },
-          '50%': { transform: 'translate3d(2%, -2%, 0) scale(1.08)' },
-        },
-        'orb-drift': {
-          '0%, 100%': { transform: 'translate3d(-9%, -7%, 0) scale(1)' },
-          '33%': { transform: 'translate3d(9%, 6%, 0) scale(1.16)' },
-          '66%': { transform: 'translate3d(-5%, -8%, 0) scale(1.05)' },
-        },
         'caret-blink': {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0' },
@@ -57,8 +48,6 @@ export default {
       animation: {
         float: 'float 7s ease-in-out infinite',
         shimmer: 'shimmer 2.4s linear infinite',
-        'gradient-pan': 'gradient-pan 18s ease-in-out infinite',
-        'orb-drift': 'orb-drift 16s ease-in-out infinite',
         'caret-blink': 'caret-blink 1s step-end infinite',
       },
     },
