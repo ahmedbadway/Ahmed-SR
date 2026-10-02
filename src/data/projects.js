@@ -141,9 +141,9 @@ export const projects = [
   },
 ];
 
-// Shown large at the top of Work, one per service line; the full list sits in
-// the project index below them. Kept off the three covers the hero already uses.
-export const FEATURED_IDS = ['dr-galal', 'apothy', 'hosni-arc', 'amr-samir'];
+// Shown large at the top of Work, in this order; the full list sits in the
+// project index below them.
+export const FEATURED_IDS = ['nefeera', 'dasani', 'amr-ziada', 'elo'];
 
 // Optional chaining keeps this module importable from plain Node scripts
 // (screenshot tooling), where Vite's import.meta.env does not exist.
