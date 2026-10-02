@@ -1,3 +1,5 @@
+import plugin from 'tailwindcss/plugin';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
@@ -16,41 +18,45 @@ export default {
         muted: 'var(--text-muted)',
         faint: 'var(--text-faint)',
         line: 'var(--border)',
+        'line-strong': 'var(--border-strong)',
+        // Translucent gold mixes. Tailwind 3 opacity modifiers (bg-gold/10)
+        // cannot act on var() colors, so the tints are explicit tokens.
+        'gold-wash': 'color-mix(in oklch, var(--gold) 12%, transparent)',
+        'gold-line': 'color-mix(in oklch, var(--gold) 50%, transparent)',
       },
       fontFamily: {
-        display: ['Sora', 'system-ui', 'sans-serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        // Geist covers Latin; Arabic glyphs fall through to Alexandria via
+        // unicode-range, so one stack serves both languages.
+        display: ['"Geist Variable"', '"Alexandria Variable"', 'system-ui', 'sans-serif'],
+        sans: ['"Geist Variable"', '"Alexandria Variable"', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {
-        tightest: '-0.045em',
+        display: '-0.045em',
       },
       maxWidth: {
         shell: '1400px',
       },
       borderRadius: {
-        card: '16px',
+        // Shape system: buttons are full pills, media and panels use `card`,
+        // inputs use `field`.
+        card: '18px',
+        field: '12px',
       },
-      keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-14px)' },
-        },
-        shimmer: {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
-        },
-        'caret-blink': {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0' },
-        },
+      zIndex: {
+        nav: 'var(--z-nav)',
+        skip: 'var(--z-skip)',
       },
-      animation: {
-        float: 'float 7s ease-in-out infinite',
-        shimmer: 'shimmer 2.4s linear infinite',
-        'caret-blink': 'caret-blink 1s step-end infinite',
+      transitionTimingFunction: {
+        out: 'var(--ease-out)',
+        'in-out': 'var(--ease-in-out)',
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // `can-hover:` gates hover-only motion to real pointers, so touch devices
+    // never get a stuck hover state after a tap.
+    plugin(({ addVariant }) => {
+      addVariant('can-hover', '@media (hover: hover) and (pointer: fine)');
+    }),
+  ],
 };

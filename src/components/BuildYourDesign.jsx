@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { m, useReducedMotion } from 'framer-motion';
 import {
   ArrowLeft,
   WhatsappLogo,
@@ -81,8 +80,8 @@ function Chip({ active, children, onClick, Icon }) {
       style={{ transitionTimingFunction: EASE_OUT }}
       className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-[color,background-color,border-color,transform] duration-200 active:scale-95 ${
         active
-          ? 'border-gold bg-gold/12 text-gold'
-          : 'border-line text-muted hover:border-gold/50 hover:text-ink'
+          ? 'border-gold bg-gold-wash text-gold'
+          : 'border-line text-muted can-hover:hover:border-gold-line can-hover:hover:text-ink'
       }`}
     >
       {Icon ? <Icon size={17} weight={active ? 'fill' : 'regular'} /> : null}
@@ -95,7 +94,7 @@ function Group({ step, label, children }) {
   return (
     <div>
       <div className="flex items-baseline gap-3">
-        <span className="font-mono text-xs text-gold">{step}</span>
+        <span className="text-xs font-semibold tabular-nums text-gold">{step}</span>
         <h2 className="font-display text-lg font-semibold tracking-tight text-ink">{label}</h2>
       </div>
       <div className="mt-5 flex flex-wrap gap-2.5">{children}</div>
@@ -104,7 +103,6 @@ function Group({ step, label, children }) {
 }
 
 export default function BuildYourDesign() {
-  const reduce = useReducedMotion();
   const { t, lang } = useLang();
 
   const [type, setType] = useState(null);
@@ -115,7 +113,8 @@ export default function BuildYourDesign() {
   const [timeline, setTimeline] = useState(DEFAULT_TIMELINE);
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
-  const [copied, setCopied] = useState(false);
+  // 'idle' | 'copied' | 'failed'
+  const [copyState, setCopyState] = useState('idle');
 
   const palette = useMemo(
     () => PALETTES.find((p) => p.id === paletteId) ?? PALETTES[0],
@@ -153,7 +152,7 @@ export default function BuildYourDesign() {
       `• ${t('brief.palette')}: ${t(palette.key)}`,
       `• ${t('brief.pages')}: ${pagesLabel}`,
       `• ${t('brief.extras')}: ${
-        extras.length ? extras.map((id) => labelOf(EXTRAS, id)).join('، ') : '—'
+        extras.length ? extras.map((id) => labelOf(EXTRAS, id)).join(lang === 'ar' ? '، ' : ', ') : '-'
       }`,
       `• ${t('brief.timeline')}: ${labelOf(TIMELINES, timeline)}`,
     ];
@@ -171,25 +170,17 @@ export default function BuildYourDesign() {
   const copyBrief = async () => {
     try {
       await navigator.clipboard.writeText(brief);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
+      setCopyState('copied');
     } catch {
-      setCopied(false);
+      setCopyState('failed');
     }
+    setTimeout(() => setCopyState('idle'), 2400);
   };
 
   const goContact = () => {
     navigate('/');
     setTimeout(() => scrollToId('contact'), 90);
   };
-
-  const reveal = reduce
-    ? { initial: { opacity: 0 }, animate: { opacity: 1 } }
-    : {
-        initial: { opacity: 0, y: 24 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-      };
 
   const pagesHint =
     pages === 1
@@ -201,11 +192,11 @@ export default function BuildYourDesign() {
   return (
     <section className="scroll-mt-24 pb-28 pt-32 md:pb-36 md:pt-40">
       <div className="shell">
-        <m.div {...reveal}>
+        <div className="enter">
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="group inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-ink"
+            className="group inline-flex items-center gap-2 text-sm text-muted transition-colors can-hover:hover:text-ink"
           >
             <ArrowLeft
               size={16}
@@ -216,7 +207,7 @@ export default function BuildYourDesign() {
 
           <span className="eyebrow mt-8 block">{t('build.eyebrow')}</span>
           {/* Solid heading — no gradient text on large type (impeccable). */}
-          <h1 className="mt-4 max-w-[16ch] font-display text-[clamp(2.5rem,7vw,5rem)] font-extrabold leading-[0.95] tracking-tightest text-ink">
+          <h1 className="mt-4 max-w-[16ch] font-display text-[clamp(2.5rem,7vw,5rem)] font-semibold leading-[1] tracking-display text-ink">
             {t('build.titleA')} <span className="text-gold">{t('build.titleB')}</span>.
           </h1>
           <p className="mt-6 max-w-[52ch] text-pretty text-base leading-relaxed text-muted md:text-lg">
@@ -225,18 +216,25 @@ export default function BuildYourDesign() {
 
           {/* Progress */}
           <div className="mt-8 flex items-center gap-3">
-            <div className="h-1.5 w-40 overflow-hidden rounded-full bg-surface-2">
-              <m.div
-                className="h-full rounded-full bg-gold"
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: reduce ? 0 : 0.4, ease: [0.23, 1, 0.32, 1] }}
+            <div
+              role="progressbar"
+              aria-valuenow={progress}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={t('build.progress')}
+              className="h-1.5 w-40 overflow-hidden rounded-full bg-surface-2"
+            >
+              {/* scaleX instead of width: the bar animates on the compositor. */}
+              <div
+                className="h-full w-full origin-left rounded-full bg-gold transition-transform duration-[400ms] ease-out rtl:origin-right"
+                style={{ transform: `scaleX(${progress / 100})` }}
               />
             </div>
-            <span className="font-mono text-xs text-faint">
+            <span className="text-xs tabular-nums text-faint">
               {progress}% {t('build.progress')}
             </span>
           </div>
-        </m.div>
+        </div>
 
         <div className="mt-14 grid gap-12 lg:grid-cols-12 lg:gap-14">
           {/* Builder */}
@@ -259,7 +257,7 @@ export default function BuildYourDesign() {
 
             <div>
               <div className="flex items-baseline gap-3">
-                <span className="font-mono text-xs text-gold">03</span>
+                <span className="text-xs font-semibold tabular-nums text-gold">03</span>
                 <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
                   {t('build.q3')}
                 </h2>
@@ -275,7 +273,7 @@ export default function BuildYourDesign() {
                       aria-pressed={active}
                       style={{ transitionTimingFunction: EASE_OUT }}
                       className={`flex flex-col gap-3 rounded-card border p-3 text-start transition-colors duration-200 ${
-                        active ? 'border-gold bg-gold/8' : 'border-line hover:border-gold/50'
+                        active ? 'border-gold bg-gold-wash' : 'border-line can-hover:hover:border-gold-line'
                       }`}
                     >
                       <div className="flex h-9 overflow-hidden rounded-lg">
@@ -294,7 +292,7 @@ export default function BuildYourDesign() {
 
             <div>
               <div className="flex items-baseline gap-3">
-                <span className="font-mono text-xs text-gold">04</span>
+                <span className="text-xs font-semibold tabular-nums text-gold">04</span>
                 <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
                   {t('build.q4')}
                 </h2>
@@ -303,19 +301,19 @@ export default function BuildYourDesign() {
                 <div className="flex items-center gap-4 rounded-full border border-line px-3 py-2">
                   <button
                     type="button"
-                    aria-label="−"
+                    aria-label={t('build.pagesLess')}
                     onClick={() => setPages((p) => Math.max(1, p - 1))}
                     className="grid h-9 w-9 place-items-center rounded-full text-ink transition-colors hover:bg-surface-2 disabled:opacity-30"
                     disabled={pages <= 1}
                   >
                     <Minus size={16} weight="bold" />
                   </button>
-                  <span className="w-10 text-center font-display text-2xl font-bold text-ink">
+                  <span aria-live="polite" className="w-10 text-center font-display text-2xl font-semibold tabular-nums text-ink">
                     {pagesLabel}
                   </span>
                   <button
                     type="button"
-                    aria-label="+"
+                    aria-label={t('build.pagesMore')}
                     onClick={() => setPages((p) => Math.min(12, p + 1))}
                     className="grid h-9 w-9 place-items-center rounded-full text-ink transition-colors hover:bg-surface-2 disabled:opacity-30"
                     disabled={pages >= 12}
@@ -345,26 +343,32 @@ export default function BuildYourDesign() {
 
             <div>
               <div className="flex items-baseline gap-3">
-                <span className="font-mono text-xs text-gold">07</span>
+                <span className="text-xs font-semibold tabular-nums text-gold">07</span>
                 <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
                   {t('build.q7')}
                 </h2>
               </div>
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={t('build.namePlaceholder')}
-                  className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink placeholder:text-faint focus:border-gold focus:outline-none"
-                />
-                <input
-                  type="text"
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder={t('build.notePlaceholder')}
-                  className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink placeholder:text-faint focus:border-gold focus:outline-none"
-                />
+                <label className="flex flex-col gap-2">
+                  <span className="text-sm text-muted">{t('build.nameLabel')}</span>
+                  <input
+                    type="text"
+                    autoComplete="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="rounded-field border border-line bg-surface px-4 py-3 text-sm text-ink focus:border-gold focus:outline-none"
+                  />
+                </label>
+                <label className="flex flex-col gap-2">
+                  <span className="text-sm text-muted">{t('build.noteLabel')}</span>
+                  <input
+                    type="text"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder={t('build.notePlaceholder')}
+                    className="rounded-field border border-line bg-surface px-4 py-3 text-sm text-ink placeholder:text-faint focus:border-gold focus:outline-none"
+                  />
+                </label>
               </div>
             </div>
           </div>
@@ -398,11 +402,11 @@ export default function BuildYourDesign() {
 
               <dl className="flex flex-col divide-y divide-line text-sm">
                 {[
-                  [t('build.sumProject'), type ? labelOf(PROJECT_TYPES, type) : '—'],
-                  [t('build.sumVibe'), style ? labelOf(STYLES, style) : '—'],
+                  [t('build.sumProject'), type ? labelOf(PROJECT_TYPES, type) : '-'],
+                  [t('build.sumVibe'), style ? labelOf(STYLES, style) : '-'],
                   [t('build.sumPalette'), t(palette.key)],
                   [t('build.sumPages'), pagesLabel],
-                  [t('build.sumAddons'), extras.length ? `${extras.length} ${t('build.selected')}` : '—'],
+                  [t('build.sumAddons'), extras.length ? `${extras.length} ${t('build.selected')}` : '-'],
                   [t('build.sumTimeline'), labelOf(TIMELINES, timeline)],
                 ].map(([k, v]) => (
                   <div key={k} className="flex items-center justify-between gap-3 py-2.5">
@@ -416,8 +420,7 @@ export default function BuildYourDesign() {
                 <button
                   type="button"
                   onClick={sendWhatsApp}
-                  style={{ transitionTimingFunction: EASE_OUT }}
-                  className="flex items-center justify-center gap-2 rounded-full bg-gold px-6 py-3.5 font-semibold text-bg transition-colors duration-200 hover:bg-gold-soft active:scale-[0.98]"
+                  className="btn btn-primary w-full"
                 >
                   <WhatsappLogo size={19} weight="fill" />
                   {t('build.send')}
@@ -425,13 +428,16 @@ export default function BuildYourDesign() {
                 <button
                   type="button"
                   onClick={copyBrief}
-                  className="flex items-center justify-center gap-2 rounded-full border border-line px-6 py-3 text-sm font-medium text-muted transition-colors duration-200 hover:border-gold hover:text-ink"
+                  aria-live="polite"
+                  className="btn btn-ghost w-full py-3 text-sm font-medium"
                 >
-                  {copied ? (
+                  {copyState === 'copied' ? (
                     <>
                       <Check size={17} weight="bold" className="text-gold" />
                       {t('build.copied')}
                     </>
+                  ) : copyState === 'failed' ? (
+                    t('build.copyFailed')
                   ) : (
                     <>
                       <Copy size={17} />
@@ -446,7 +452,7 @@ export default function BuildYourDesign() {
                 <button
                   type="button"
                   onClick={goContact}
-                  className="text-gold underline-offset-2 hover:underline"
+                  className="text-gold underline-offset-2 can-hover:hover:underline"
                 >
                   {t('build.contactOptions')}
                 </button>

@@ -3,36 +3,39 @@
 @tailwind utilities;
 
 /* ============================================================
-   Design tokens — single OKLCH source of truth.
-   Dark-luxury theme: off-black base, warm-gold accent.
+   Design tokens: single OKLCH source of truth.
+   Dark-luxury theme: cool off-black base, one champagne-gold accent.
+   The brand is dark by identity, so the page locks to one theme.
    ============================================================ */
 :root {
-  /* Cool near-black base (faint slate tint) so the warm accent reads crisp and
-     modern instead of muddy — a contemporary jeweler contrast, never pure #000. */
   --bg: oklch(0.15 0.008 265);          /* deep cool off-black */
-  --surface: oklch(0.198 0.010 265);    /* lifted card base */
+  --surface: oklch(0.198 0.010 265);    /* lifted surface */
   --surface-2: oklch(0.242 0.013 265);  /* hover / nested surface */
 
-  /* Luminous champagne-gold — brighter + more chroma than the old muted brown
-     so it feels current and expensive rather than dated. */
   --gold: oklch(0.81 0.125 88);         /* primary champagne gold */
-  --gold-soft: oklch(0.89 0.105 92);    /* highlight / hover */
+  --gold-soft: oklch(0.89 0.105 92);    /* hover */
   --gold-dim: oklch(0.67 0.115 84);     /* pressed / borders */
 
   --text: oklch(0.98 0.003 260);        /* near-white, faint cool cast */
   --text-muted: oklch(0.78 0.006 260);  /* secondary copy */
-  --text-faint: oklch(0.60 0.008 260);  /* tertiary / labels */
+  --text-faint: oklch(0.64 0.008 260);  /* tertiary / labels (AA on --bg) */
 
-  --border: oklch(1 0 0 / 0.09);        /* glass edge */
-  --border-strong: oklch(1 0 0 / 0.15);
+  --border: oklch(1 0 0 / 0.09);
+  --border-strong: oklch(1 0 0 / 0.16);
 
-  --gold-rgb: 232 184 77;               /* for rgba() glows — matches --gold */
-  --gold-soft-rgb: 246 219 142;         /* brighter gold for bold glows/orbs */
+  /* Shadows carry the background hue instead of pure black. */
+  --shadow-deep: oklch(0.08 0.02 265 / 0.75);
 
-  /* Motion easing (Emil Kowalski): built-in CSS easings are too weak. Strong
-     ease-out for enter/UI feedback, ease-in-out for on-screen movement. */
+  /* Motion (Emil Kowalski): built-in easings are too weak. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Layering scale: every z-index on the site comes from here. */
+  --z-backdrop: 0;
+  --z-content: 10;
+  --z-nav: 50;
+  --z-skip: 60;
 
   color-scheme: dark;
 }
@@ -41,18 +44,13 @@
    Base
    ============================================================ */
 html {
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Keeps focused and scrolled-to elements clear of the fixed nav. */
+  scroll-padding-top: 6rem;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-}
-
-/* Lenis smooth-scroll: hand scroll control to the RAF loop and keep nested
-   scrollable areas (e.g. data-lenis-prevent) behaving natively. */
+/* Lenis drives smooth scrolling; keep native smooth-scroll off underneath it. */
 html.lenis,
 html.lenis body {
   height: auto;
@@ -71,30 +69,34 @@ body {
   margin: 0;
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
-  font-feature-settings: 'ss01', 'cv01';
+  font-family: 'Geist Variable', 'Alexandria Variable', system-ui, sans-serif;
+  font-feature-settings: 'ss01';
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
-/* Arabic (RTL): Cairo covers both body and display. Slightly relax the tight
-   display tracking, which is tuned for Latin grotesques and cramps Arabic. */
-html[dir='rtl'] body,
-html[dir='rtl'] .font-display,
-html[dir='rtl'] .font-mono {
-  font-family: 'Cairo', system-ui, sans-serif;
+/* Arabic: Alexandria sets every glyph. Latin display tracking is tuned for
+   Geist and would cramp Arabic letterforms, so it relaxes under RTL. */
+html[dir='rtl'] body {
+  font-family: 'Alexandria Variable', 'Geist Variable', system-ui, sans-serif;
 }
-html[dir='rtl'] .tracking-tightest {
+html[dir='rtl'] .tracking-display,
+html[dir='rtl'] .tracking-tight,
+html[dir='rtl'] .tracking-tighter {
   letter-spacing: 0;
 }
+/* Arabic letterforms stack taller ascenders and dots than Latin, so display
+   headings need more leading than the tight Latin setting. */
+html[dir='rtl'] :is(h1, h2, h3) {
+  line-height: 1.3;
+}
 
-/* Skip rendering + layout of far-off-screen sections until they scroll near.
-   IntersectionObserver-driven reveals still fire. The intrinsic size keeps the
-   scrollbar honest before a section is realized. */
-.cv-auto {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 600px;
+/* Returning Arabic visitors: the prerendered HTML is English, so it stays
+   hidden until React renders the Arabic tree (see index.html + main.jsx). */
+html.pre-ar #root {
+  visibility: hidden;
 }
 
 ::selection {
@@ -102,14 +104,12 @@ html[dir='rtl'] .tracking-tightest {
   color: var(--bg);
 }
 
-/* Focus visibility for keyboard users (a11y) */
-:where(a, button, [tabindex]):focus-visible {
+:where(a, button, [tabindex], input, textarea):focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
-/* Gold scrollbar accent on supporting browsers */
 @supports (scrollbar-color: auto) {
   html {
     scrollbar-color: var(--gold-dim) transparent;
@@ -118,109 +118,308 @@ html[dir='rtl'] .tracking-tightest {
 }
 
 /* ============================================================
-   Component utilities
+   Components
    ============================================================ */
 @layer components {
-  /* Premium card surface: opaque lifted fill + 1px edge + inner highlight.
-     Intentionally NO backdrop-filter. A live blur is one of the most
-     expensive things a browser can paint, and it was applied to ~13 cards
-     (Skills + Contact + Navbar) that sit over an animated background — every
-     card re-sampled and re-blurred the backdrop on every scroll frame,
-     which measured as the single largest cause of scroll jank (removing it
-     roughly doubled the frame rate). The opaque `var(--surface)` fill gives
-     the same lifted, high-end look without any per-frame blur cost. */
-  .glass {
-    background:
-      linear-gradient(
-        180deg,
-        oklch(1 0 0 / 0.05) 0%,
-        oklch(1 0 0 / 0.02) 100%
-      ),
-      var(--surface);
-    border: 1px solid var(--border);
-    box-shadow:
-      inset 0 1px 0 oklch(1 0 0 / 0.08),
-      0 24px 60px -32px oklch(0 0 0 / 0.8);
-  }
-
-  .text-gradient-gold {
-    background: linear-gradient(
-      100deg,
-      var(--gold-soft) 0%,
-      var(--gold) 45%,
-      var(--gold-dim) 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  /* Small uppercase mono label (used sparingly per taste-skill) */
-  .eyebrow {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--gold);
-  }
-
   .shell {
     width: 100%;
     max-width: 1400px;
     margin-inline: auto;
-    padding-inline: 1.5rem;
+    padding-inline: 1.25rem;
   }
   @media (min-width: 768px) {
     .shell {
       padding-inline: 2.5rem;
     }
   }
+
+  /* Lifted surface used by the nav sheet and the build studio summary. Opaque
+     on purpose: a live backdrop-filter over the page costs more per frame
+     than the whole rest of the site. */
+  .glass {
+    background:
+      linear-gradient(180deg, oklch(1 0 0 / 0.045) 0%, oklch(1 0 0 / 0.015) 100%),
+      var(--surface);
+    border: 1px solid var(--border);
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 0.07),
+      0 24px 60px -32px var(--shadow-deep);
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  html[dir='rtl'] .eyebrow {
+    letter-spacing: 0;
+    font-size: 0.875rem;
+  }
+
+  /* Buttons: one pill shape across the site. Press feedback is a 0.97 scale
+     (transform only), colour changes stay on their own short transition. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    white-space: nowrap;
+    border-radius: 9999px;
+    padding: 0.9rem 1.6rem;
+    font-weight: 600;
+    font-size: 0.975rem;
+    line-height: 1;
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease;
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--bg);
+  }
+  .btn-ghost {
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+      background: var(--gold-soft);
+    }
+    .btn-ghost:hover {
+      border-color: var(--gold);
+    }
+  }
 }
 
-/* Card-fan carousel (Projects). Breakpoints (480/640/768/1024) match
-   CardFanCarousel.jsx's own getResponsiveMultiplier/getHeightMultiplier — the
-   container height and card width here must stay in lockstep with the JS or
-   the GSAP-driven fan math and the CSS box it animates inside will disagree.
-   Cards are centered via `margin: auto`, not a transform, so GSAP's
-   x/y/rotate/scale (also transforms) compose cleanly on top instead of
-   overwriting a centering transform. */
-.fan-layout {
-  position: relative;
-  height: 20rem;
+/* ============================================================
+   Static page backdrop (SiteBackdrop.jsx): one fixed layer painted once.
+   A champagne glow sits behind the hero headline and a faint film grain
+   breaks the flat digital black. No animation, no blur filter, no blend
+   mode, and a real fixed element rather than background-attachment: fixed
+   (which would repaint on every scroll).
+   ============================================================ */
+.site-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-backdrop);
+  pointer-events: none;
+  contain: strict;
+  background:
+    radial-gradient(
+      ellipse 60% 50% at 28% 32%,
+      color-mix(in oklch, var(--gold) 15%, transparent) 0%,
+      color-mix(in oklch, var(--gold) 5%, transparent) 45%,
+      transparent 72%
+    ),
+    var(--bg);
 }
-@media (min-width: 480px) {
-  .fan-layout { height: 23rem; }
+html[dir='rtl'] .site-backdrop {
+  background:
+    radial-gradient(
+      ellipse 60% 50% at 72% 32%,
+      color-mix(in oklch, var(--gold) 15%, transparent) 0%,
+      color-mix(in oklch, var(--gold) 5%, transparent) 45%,
+      transparent 72%
+    ),
+    var(--bg);
 }
-@media (min-width: 640px) {
-  .fan-layout { height: 26rem; }
-}
-@media (min-width: 768px) {
-  .fan-layout { height: 32rem; }
-}
-@media (min-width: 1024px) {
-  .fan-layout { height: 36rem; }
-}
-
-.fan-card {
+.site-backdrop::after {
+  content: '';
   position: absolute;
   inset: 0;
-  margin: auto;
-  width: 12rem;
-  aspect-ratio: 16 / 10;
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  box-shadow: 0 24px 60px -32px oklch(0 0 0 / 0.8);
-  will-change: transform;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-@media (min-width: 480px) {
-  .fan-card { width: 15rem; }
+
+/* ============================================================
+   Hero entrance. Pure CSS so it starts on the very first paint of the
+   prerendered HTML, before any JavaScript arrives (CSS animations also run
+   off the main thread, so hydration cannot make them stutter).
+   ============================================================ */
+@keyframes word-rise {
+  from {
+    transform: translate3d(0, 105%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
 }
-@media (min-width: 640px) {
-  .fan-card { width: 19rem; }
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
-@media (min-width: 768px) {
-  .fan-card { width: 24rem; }
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
-@media (min-width: 1024px) {
-  .fan-card { width: 28rem; }
+
+.word-mask {
+  display: inline-block;
+  overflow: clip;
+  overflow-clip-margin: 0.12em;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+html[dir='rtl'] .word-mask {
+  padding-bottom: 0.22em;
+  margin-bottom: -0.22em;
+}
+.word {
+  display: inline-block;
+  animation: word-rise 900ms var(--ease-out) both;
+  animation-delay: calc(120ms + var(--i, 0) * 45ms);
+}
+.enter {
+  animation: rise 900ms var(--ease-out) both;
+  animation-delay: calc(var(--d, 0) * 1ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word {
+    animation: fade 300ms ease both;
+  }
+  .enter {
+    animation: fade 300ms ease both;
+  }
+}
+
+/* ============================================================
+   Scroll reveal. Elements carry data-reveal; useReveal() sets data-in once
+   they enter the viewport. Hidden only when JavaScript is present (the
+   `js` class comes from an inline script), so content is never lost if the
+   bundle fails. Transform + opacity only.
+   ============================================================ */
+[data-reveal] {
+  transition:
+    opacity 850ms var(--ease-out),
+    transform 850ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.js [data-reveal]:not([data-in]) {
+  opacity: 0;
+  transform: translate3d(0, 32px, 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transition: opacity 300ms ease;
+    transition-delay: 0ms;
+  }
+  .js [data-reveal]:not([data-in]) {
+    transform: none;
+  }
+}
+
+/* ============================================================
+   Scroll-linked details (CSS scroll-driven animations). Progressive
+   enhancement: browsers without view timelines simply show the final state.
+   These run on the compositor in Chromium, with zero JavaScript per frame.
+   ============================================================ */
+/* Starts at 0.38: the lowest opacity at which the large About text still
+   meets WCAG's 3:1 contrast for large type before it lights up. */
+@keyframes word-light {
+  from {
+    opacity: 0.38;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes draw-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.process-line {
+  transform-origin: left center;
+}
+html[dir='rtl'] .process-line {
+  transform-origin: right center;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scrub-word {
+      animation: word-light linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 40%;
+    }
+    .process-line {
+      animation: draw-x linear both;
+      animation-timeline: view();
+      animation-range: entry 40% cover 55%;
+    }
+  }
+}
+
+/* ============================================================
+   Tools marquee (About). One marquee on the page. Transform-only loop on a
+   composited layer, paused whenever it is off-screen and removed entirely
+   under reduced motion.
+   ============================================================ */
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+.marquee[data-paused] .marquee-track {
+  animation-play-state: paused;
+}
+.marquee {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+  }
+  .marquee-dup {
+    display: none;
+  }
+}
+
+/* ============================================================
+   Work filter: View Transitions morph the grid when the filter changes.
+   ============================================================ */
+::view-transition-group(*) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-in-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }

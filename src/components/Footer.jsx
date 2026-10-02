@@ -1,32 +1,35 @@
 import { ArrowUp } from '@phosphor-icons/react';
 import { scrollToId } from '../utils/scrollToId.js';
 import { useLang } from '../i18n/LanguageProvider.jsx';
+import Logo from './Logo.jsx';
 
 export default function Footer() {
   const { t } = useLang();
   const year = new Date().getFullYear();
+
   return (
-    <footer className="relative z-10 border-t border-line">
-      <div className="shell flex flex-col items-start justify-between gap-6 py-10 sm:flex-row sm:items-center">
-        <div>
-          <p className="font-display text-lg font-bold tracking-tightest text-ink">
-            Ahmed Badway
+    <footer className="relative z-[var(--z-content)] border-t border-line">
+      <div className="shell flex flex-col items-start justify-between gap-8 py-10 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3">
+          <Logo />
+          <p className="text-sm text-faint">
+            {/* The build-time year can differ from the visitor's clock. */}
+            <span suppressHydrationWarning>{t('footer.rights').replace('{year}', year)}</span>
+            <span aria-hidden="true" className="px-2">
+              /
+            </span>
+            {t('footer.place')}
           </p>
-          <p className="mt-1 text-sm text-faint">{t('footer.built')}</p>
         </div>
 
-        <div className="flex items-center gap-6">
-          <span className="text-sm text-faint">
-            © {year} — {t('footer.place')}
-          </span>
-          <button
-            onClick={() => scrollToId('main')}
-            className="group flex items-center gap-2 rounded-full border border-line px-4 py-2 text-sm text-muted transition-colors hover:border-gold hover:text-ink"
-          >
-            {t('footer.top')}
-            <ArrowUp size={16} className="transition-transform group-hover:-translate-y-0.5" />
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => scrollToId('main')}
+          className="btn btn-ghost px-5 py-3 text-sm"
+        >
+          {t('footer.top')}
+          <ArrowUp size={15} weight="bold" />
+        </button>
       </div>
     </footer>
   );

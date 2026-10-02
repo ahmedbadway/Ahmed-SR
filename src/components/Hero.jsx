@@ -1,166 +1,196 @@
-import { useRef } from 'react';
-import { m, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 import { ArrowDown, ArrowUpRight } from '@phosphor-icons/react';
-import Magnetic from './Magnetic.jsx';
-import Typewriter from './Typewriter.jsx';
 import { scrollToId } from '../utils/scrollToId.js';
 import { navigate } from '../hooks/useHashRoute.js';
 import { useLang } from '../i18n/LanguageProvider.jsx';
+import { projects, coverSrc, coverSrcSet } from '../data/projects.js';
 
-// Per-character reveal for the name (0.08s stagger). Reduced-motion visitors
-// get a single soft fade with no vertical travel — see `charReduced` below.
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.12 } },
-};
-const charMotion = {
-  hidden: { y: '110%', opacity: 0 },
-  show: {
-    y: '0%',
-    opacity: 1,
-    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+// Three real covers fanned behind the headline. Order: back, middle, front.
+// `depth` is the parallax travel in px at the pointer's furthest reach.
+const STACK = [
+  {
+    id: 'elo',
+    frame: 'top-0 end-0 w-[70%]',
+    tilt: 'rotate-[4deg]',
+    depth: 10,
   },
-};
-const charReduced = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { duration: 0.4 } },
-};
+  {
+    id: 'amr-ziada',
+    frame: 'top-[24%] start-0 w-[64%]',
+    tilt: '-rotate-[3deg]',
+    depth: 18,
+  },
+  {
+    id: 'nefeera',
+    frame: 'bottom-0 end-[8%] w-[60%]',
+    tilt: 'rotate-[1.5deg]',
+    depth: 30,
+  },
+];
+
+// Headline words wrapped in *asterisks* in the translation render in gold.
+function parseWords(text) {
+  return text.split(' ').map((token) => {
+    const match = token.match(/^\*(.+?)\*(.*)$/);
+    return match ? { word: match[1], tail: match[2], accent: true } : { word: token, tail: '', accent: false };
+  });
+}
+
+// Pointer parallax for the cover stack. Runs only on hover-capable pointers
+// with motion allowed. Transforms are written straight to the layer elements
+// (no React state, no CSS-variable cascade), and the rAF loop stops as soon
+// as the layers settle, so an idle hero costs nothing per frame.
+function useStackParallax(sectionRef, layerRefs) {
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return undefined;
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!fine || reduce) return undefined;
+
+    const target = { x: 0, y: 0 };
+    const current = { x: 0, y: 0 };
+    let raf = 0;
+
+    const tick = () => {
+      current.x += (target.x - current.x) * 0.08;
+      current.y += (target.y - current.y) * 0.08;
+      layerRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const d = STACK[i].depth;
+        el.style.transform = `translate3d(${(current.x * d).toFixed(2)}px, ${(current.y * d).toFixed(2)}px, 0)`;
+      });
+      const settled =
+        Math.abs(target.x - current.x) < 0.001 && Math.abs(target.y - current.y) < 0.001;
+      raf = settled ? 0 : requestAnimationFrame(tick);
+    };
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+
+    // Rect is read on enter only; reading it on every move would force layout.
+    let rect = null;
+    const onEnter = () => {
+      rect = section.getBoundingClientRect();
+    };
+    const onMove = (e) => {
+      if (!rect) rect = section.getBoundingClientRect();
+      target.x = -((e.clientX - rect.left) / rect.width - 0.5) * 2;
+      target.y = -((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      kick();
+    };
+    const onLeave = () => {
+      rect = null;
+      target.x = 0;
+      target.y = 0;
+      kick();
+    };
+
+    section.addEventListener('pointerenter', onEnter);
+    section.addEventListener('pointermove', onMove);
+    section.addEventListener('pointerleave', onLeave);
+    return () => {
+      cancelAnimationFrame(raf);
+      section.removeEventListener('pointerenter', onEnter);
+      section.removeEventListener('pointermove', onMove);
+      section.removeEventListener('pointerleave', onLeave);
+    };
+  }, [sectionRef, layerRefs]);
+}
 
 export default function Hero() {
-  const ref = useRef(null);
-  const reduce = useReducedMotion();
-  const { t, lang } = useLang();
-  const isAr = lang === 'ar';
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start start', 'end start'],
-  });
-  const yContent = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 120]);
-  const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const char = reduce ? charReduced : charMotion;
+  const { t } = useLang();
+  const sectionRef = useRef(null);
+  const layerRefs = useRef([]);
+  useStackParallax(sectionRef, layerRefs);
 
-  const name = t('hero.name');
+  const words = parseWords(t('hero.title'));
 
   return (
     <section
-      ref={ref}
-      className="relative flex min-h-[100dvh] items-center overflow-hidden pt-24"
+      ref={sectionRef}
+      id="hero"
+      className="relative flex min-h-[100dvh] items-center pb-16 pt-28 md:pt-32"
     >
-      <m.div style={{ y: yContent, opacity }} className="shell relative z-10">
-        <m.span
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.05 }}
-          className="eyebrow"
-        >
-          {t('hero.eyebrow')}
-        </m.span>
+      <div className="shell grid items-center gap-14 lg:grid-cols-12 lg:gap-8">
+        <div className="lg:col-span-7">
+          <p className="eyebrow enter" style={{ '--d': 0 }}>
+            {t('hero.kicker')}
+          </p>
 
-        <m.h1
-          variants={container}
-          initial="hidden"
-          animate="show"
-          aria-label={name}
-          className="mt-6 font-display text-[clamp(2.75rem,11vw,9.5rem)] font-extrabold leading-[0.92] tracking-tightest text-ink"
-        >
-          {name.split(' ').map((word, wi) => (
-            <span key={wi} className="me-[0.18em] inline-block whitespace-nowrap">
-              {isAr ? (
-                // Arabic letters connect — animate the whole word as one unit so
-                // ligatures are preserved (per-character would isolate each form).
-                <span className="inline-block overflow-hidden align-bottom">
-                  <m.span variants={char} className="inline-block">
+          <h1 className="mt-6 text-balance font-display text-[clamp(2.5rem,4.6vw,4.4rem)] font-semibold leading-[1.04] tracking-display text-ink">
+            {words.map(({ word, tail, accent }, i) => (
+              <span key={i}>
+                <span className="word-mask">
+                  <span className={`word ${accent ? 'text-gold' : ''}`} style={{ '--i': i }}>
                     {word}
-                  </m.span>
-                </span>
-              ) : (
-                word.split('').map((c, i) => (
-                  <span key={i} className="inline-block overflow-hidden align-bottom">
-                    <m.span variants={char} className="inline-block">
-                      {c}
-                    </m.span>
                   </span>
-                ))
-              )}
-            </span>
-          ))}
-        </m.h1>
+                  {tail ? (
+                    <span className="word" style={{ '--i': i }}>
+                      {tail}
+                    </span>
+                  ) : null}
+                </span>{' '}
+              </span>
+            ))}
+          </h1>
 
-        <m.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-7 max-w-[52ch] font-mono text-sm text-muted sm:text-base md:text-lg"
-        >
-          {t('hero.leadPrefix')}{' '}
-          <Typewriter words={t('hero.words')} />
-        </m.p>
-
-        <m.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 1.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-10 flex flex-wrap items-center gap-4"
-        >
-          <Magnetic>
-            <button
-              onClick={() => scrollToId('projects')}
-              className="group flex items-center gap-2 rounded-full bg-gold px-7 py-3.5 font-semibold text-bg transition-colors duration-200 hover:bg-gold-soft active:scale-[0.98]"
-            >
-              {t('hero.viewWork')}
-              <ArrowDown
-                size={18}
-                weight="bold"
-                className="transition-transform group-hover:translate-y-0.5"
-              />
-            </button>
-          </Magnetic>
-          <Magnetic>
-            <button
-              onClick={() => scrollToId('contact')}
-              className="group flex items-center gap-2 rounded-full border border-line px-7 py-3.5 font-semibold text-ink transition-colors duration-200 hover:border-gold active:scale-[0.98]"
-            >
-              {t('hero.contact')}
-              <ArrowUpRight
-                size={18}
-                weight="bold"
-                className="text-gold transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:-scale-x-100"
-              />
-            </button>
-          </Magnetic>
-
-          <button
-            onClick={() => navigate('/build')}
-            className="group inline-flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-gold"
+          <p
+            className="enter mt-7 max-w-[46ch] text-pretty text-lg leading-relaxed text-muted md:text-xl"
+            style={{ '--d': 520 }}
           >
-            {t('hero.orBuild')}
-            <ArrowUpRight
-              size={15}
-              weight="bold"
-              className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:-scale-x-100"
-            />
-          </button>
-        </m.div>
-      </m.div>
+            {t('hero.lead')}
+          </p>
 
-      {/* Scroll cue */}
-      {!reduce && (
-        <m.div
-          style={{ opacity }}
-          className="absolute inset-x-0 bottom-8 flex justify-center"
-        >
-          <m.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-            className="flex flex-col items-center gap-2 text-faint"
+          <div className="enter mt-10 flex flex-wrap items-center gap-3" style={{ '--d': 640 }}>
+            <button type="button" onClick={() => navigate('/build')} className="btn btn-primary">
+              {t('hero.primary')}
+              <ArrowUpRight size={17} weight="bold" className="rtl:-scale-x-100" />
+            </button>
+            <button type="button" onClick={() => scrollToId('work')} className="btn btn-ghost">
+              {t('hero.secondary')}
+              <ArrowDown size={17} weight="bold" />
+            </button>
+          </div>
+        </div>
+
+        <div className="lg:col-span-5">
+          <div
+            role="img"
+            aria-label={t('hero.visual')}
+            className="relative mx-auto aspect-[1.08] w-full max-w-[560px]"
           >
-            <span className="text-[0.7rem] uppercase tracking-[0.2em]">
-              {t('hero.scroll')}
-            </span>
-            <ArrowDown size={16} />
-          </m.div>
-        </m.div>
-      )}
+            {STACK.map((layer, i) => {
+              const project = projects.find((p) => p.id === layer.id);
+              return (
+                <div
+                  key={layer.id}
+                  className={`enter absolute ${layer.frame}`}
+                  style={{ '--d': 260 + i * 130 }}
+                >
+                  <div ref={(el) => (layerRefs.current[i] = el)} className="will-change-transform">
+                    <div
+                      className={`${layer.tilt} overflow-hidden rounded-card bg-surface shadow-[0_40px_80px_-36px_var(--shadow-deep)] ring-1 ring-line-strong`}
+                    >
+                      <img
+                        src={coverSrc(project.image)}
+                        srcSet={coverSrcSet(project.image)}
+                        sizes="(min-width: 1024px) 28vw, 64vw"
+                        width="1600"
+                        height="1000"
+                        alt=""
+                        decoding="async"
+                        fetchPriority={i === STACK.length - 1 ? 'high' : 'auto'}
+                        className="block aspect-[16/10] h-auto w-full object-cover object-top"
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

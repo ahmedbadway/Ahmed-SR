@@ -1,26 +1,41 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 
-// Self-hosted fonts (no runtime Google <link> in production).
-import '@fontsource/sora/600.css';
-import '@fontsource/sora/700.css';
-import '@fontsource/sora/800.css';
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/500.css';
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/500.css';
-// Arabic display + body face (loaded once; used when dir="rtl").
-import '@fontsource/cairo/500.css';
-import '@fontsource/cairo/700.css';
+// Self-hosted variable fonts (no runtime Google <link>). Geist sets Latin
+// text; Arabic glyphs fall through to Alexandria via unicode-range, so the
+// Arabic file only downloads when Arabic text is on screen.
+import '@fontsource-variable/geist';
+import '@fontsource-variable/alexandria';
 
 import App from './App.jsx';
 import { LanguageProvider } from './i18n/LanguageProvider.jsx';
 import './styles/index.css';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const container = document.getElementById('root');
+const app = (
   <React.StrictMode>
     <LanguageProvider>
       <App />
     </LanguageProvider>
   </React.StrictMode>
 );
+
+// The HTML ships prerendered (scripts/prerender.mjs) for the English home
+// route, so first paint does not wait for JavaScript. Hydrate when the
+// visitor will see exactly that markup; otherwise (Arabic, or a deep link to
+// #/build) render fresh so React never patches a mismatched tree.
+let storedLang = null;
+try {
+  storedLang = window.localStorage.getItem('ab-lang');
+} catch {
+  /* storage disabled */
+}
+const onHome = !window.location.hash.replace(/^#/, '').startsWith('/build');
+const canHydrate = container.hasChildNodes() && onHome && storedLang !== 'ar';
+
+if (canHydrate) {
+  hydrateRoot(container, app);
+} else {
+  container.textContent = '';
+  createRoot(container).render(app);
+}
