@@ -6,22 +6,24 @@ import { useLang } from '../i18n/LanguageProvider.jsx';
 import { projects, coverSrc, coverSrcSet } from '../data/projects.js';
 
 // Three real covers fanned behind the headline. Order: back, middle, front.
+// None of them repeats a featured project in Work (FEATURED_IDS), so the
+// first scroll shows seven different sites, not the same three twice.
 // `depth` is the parallax travel in px at the pointer's furthest reach.
 const STACK = [
   {
-    id: 'elo',
+    id: 'hosni-arc',
     frame: 'top-0 end-0 w-[70%]',
     tilt: 'rotate-[4deg]',
     depth: 10,
   },
   {
-    id: 'amr-ziada',
+    id: 'apothy',
     frame: 'top-[24%] start-0 w-[64%]',
     tilt: '-rotate-[3deg]',
     depth: 18,
   },
   {
-    id: 'nefeera',
+    id: 'dr-galal',
     frame: 'bottom-0 end-[8%] w-[60%]',
     tilt: 'rotate-[1.5deg]',
     depth: 30,
