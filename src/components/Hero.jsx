@@ -46,24 +46,6 @@ export default function Hero() {
       ref={ref}
       className="relative flex min-h-[100dvh] items-center overflow-hidden pt-24"
     >
-      {/* Bold gold orb drifting behind the name. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
-      >
-        <div
-          className={`h-[min(900px,100vw)] w-[min(900px,100vw)] rounded-full ${
-            reduce ? '' : 'animate-orb-drift'
-          }`}
-          style={{
-            background:
-              'radial-gradient(circle, rgba(var(--gold-soft-rgb), 0.85) 0%, rgba(var(--gold-soft-rgb), 0.55) 24%, rgba(var(--gold-rgb), 0.32) 46%, rgba(var(--gold-rgb), 0.12) 62%, transparent 76%)',
-            filter: 'blur(28px)',
-            willChange: 'transform',
-          }}
-        />
-      </div>
-
       <m.div style={{ y: yContent, opacity }} className="shell relative z-10">
         <m.span
           initial={{ opacity: 0, y: 12 }}

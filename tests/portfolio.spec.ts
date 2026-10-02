@@ -22,10 +22,9 @@ test.describe('page shell', () => {
     expect(doc).toBeLessThanOrEqual(win + 1);
   });
 
-  test('renders the GradientMesh background and no leftover canvas', async ({ page }) => {
+  test('has no animated background layers and no canvas', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('.gradient-mesh')).toHaveCount(1);
-    // The old ParticleField canvas background was removed.
+    await expect(page.locator('.gradient-mesh')).toHaveCount(0);
     await expect(page.locator('canvas')).toHaveCount(0);
   });
 
