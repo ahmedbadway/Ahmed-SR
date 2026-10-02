@@ -116,4 +116,32 @@ export const projects = [
     gradient: ['oklch(0.48 0.10 300)', 'oklch(0.16 0.04 290)'],
     image: 'amr-samir.webp',
   },
+  {
+    id: 'nefeera',
+    name: 'Nefeera',
+    type: 'Wedding Planning',
+    type_ar: 'تنظيم أفراح',
+    description:
+      'A wedding planner’s studio site in English and Arabic — an image-led hero, a clear process, a gallery, and a WhatsApp-first inquiry path.',
+    description_ar:
+      'موقع استوديو لتنظيم الأفراح بالعربي والإنجليزي — هيرو بصري، مراحل شغل واضحة، معرض أعمال، وطلب حجز سريع على واتساب.',
+    tech: ['React', 'Tailwind', 'i18n'],
+    url: 'https://ahmedbadway.github.io/Nefeera/',
+    gradient: ['oklch(0.52 0.05 150)', 'oklch(0.20 0.03 155)'],
+    image: 'nefeera.webp',
+  },
+  {
+    id: 'hosni-arc',
+    name: 'Hosni Arc Studio',
+    type: 'Architecture & Interiors',
+    type_ar: 'عمارة وتصميم داخلي',
+    description:
+      'A dark, blueprint-inspired site for a Cairo architecture studio — bold type, a studio profile, and a project showcase.',
+    description_ar:
+      'موقع داكن بروح المخططات الهندسية لاستوديو عمارة في القاهرة — تايبوجرافي جريء، نبذة عن الاستوديو، وعرض للمشاريع.',
+    tech: ['React', 'Tailwind'],
+    url: 'https://www.hosniarcstudio.com/',
+    gradient: ['oklch(0.36 0.05 175)', 'oklch(0.14 0.01 190)'],
+    image: 'hosni-arc.webp',
+  },
 ];

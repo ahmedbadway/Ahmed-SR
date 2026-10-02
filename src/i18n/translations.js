@@ -35,7 +35,7 @@ export const translations = {
     'about.stat.bilingualValue': 'AR · EN',
 
     'projects.eyebrow': 'Selected Work',
-    'projects.title': 'Eight builds across luxury, beauty, and health.',
+    'projects.title': 'Ten builds across luxury, beauty, and health.',
     'projects.intro':
       'Every site is custom — no templates. Browse with the arrows, then open any project to view it live.',
     'projects.live': 'Live Site',
@@ -167,7 +167,7 @@ export const translations = {
     'about.stat.bilingualValue': 'عربي · إنجليزي',
 
     'projects.eyebrow': 'أعمال مختارة',
-    'projects.title': 'ثمانية مواقع في الفخامة والجمال والصحة.',
+    'projects.title': 'عشرة مواقع في الفخامة والجمال والصحة.',
     'projects.intro':
       'كل موقع مصمَّم من الصفر — من غير قوالب. تصفّح بالأسهم وافتح أي مشروع تشوفه لايف.',
     'projects.live': 'زيارة الموقع',

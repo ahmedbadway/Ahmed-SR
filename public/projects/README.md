@@ -17,3 +17,5 @@ convert it to a size-budgeted WebP automatically.
 | `dasani.webp`     | Dasani                   | https://ahmedbadway.github.io/Dasani/ |
 | `lufara.webp`     | Lufara                   | https://ahmedbadway.github.io/Lufara/ |
 | `amr-samir.webp`  | Amr Samir                | https://ahmedbadway.github.io/AMR-SMAIER/ |
+| `nefeera.webp`    | Nefeera                  | https://ahmedbadway.github.io/Nefeera/ |
+| `hosni-arc.webp`  | Hosni Arc Studio         | https://www.hosniarcstudio.com/ |

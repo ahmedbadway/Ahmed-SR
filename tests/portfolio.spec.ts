@@ -42,7 +42,7 @@ test.describe('project fan carousel', () => {
     const section = page.locator('#projects');
     await section.scrollIntoViewIfNeeded();
 
-    await expect(section.locator('.fan-card')).toHaveCount(8);
+    await expect(section.locator('.fan-card')).toHaveCount(10);
     await expect(section.locator('h3').first()).toBeVisible();
     await expect(section.getByRole('link', { name: /Live Site/i })).toBeVisible();
   });

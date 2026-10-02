@@ -1,6 +1,7 @@
 import { m, useReducedMotion } from 'framer-motion';
 import { useCountUp } from '../hooks/useCountUp.js';
 import SectionHeading from './SectionHeading.jsx';
+import { projects } from '../data/projects.js';
 import { useLang } from '../i18n/LanguageProvider.jsx';
 
 function StatNumber({ value, suffix = '' }) {
@@ -18,8 +19,8 @@ export default function About() {
   const { t } = useLang();
 
   const stats = [
-    { kind: 'num', value: 8, label: t('about.stat.projects') },
-    { kind: 'num', value: 6, label: t('about.stat.niches') },
+    { kind: 'num', value: projects.length, label: t('about.stat.projects') },
+    { kind: 'num', value: 7, label: t('about.stat.niches') },
     { kind: 'text', value: t('about.stat.bilingualValue'), label: t('about.stat.bilingual') },
   ];
 
