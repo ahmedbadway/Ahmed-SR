@@ -403,42 +403,6 @@ html[dir='rtl'] .process-line {
 }
 
 /* ============================================================
-   Tools marquee (About). One marquee on the page. Transform-only loop on a
-   composited layer, paused whenever it is off-screen and removed entirely
-   under reduced motion.
-   ============================================================ */
-@keyframes marquee {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: marquee 38s linear infinite;
-}
-.marquee[data-paused] .marquee-track {
-  animation-play-state: paused;
-}
-.marquee {
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-}
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track {
-    animation: none;
-    flex-wrap: wrap;
-    width: auto;
-  }
-  .marquee-dup {
-    display: none;
-  }
-}
-
-/* ============================================================
    Work filter: View Transitions morph the grid when the filter changes.
    ============================================================ */
 ::view-transition-group(*) {

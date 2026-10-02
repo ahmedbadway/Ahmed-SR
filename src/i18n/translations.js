@@ -3,7 +3,7 @@
 // LanguageProvider. Proper nouns (React, brand names, phone, email, @handles)
 // are intentionally NOT translated and stay literal in the components.
 // Project type/description translations live with the data in data/projects.js.
-// Strings may carry a `{year}` token that the component fills in. In
+// Strings may carry a `{year}` or `{count}` token that the component fills in. In
 // 'hero.title', words wrapped in *asterisks* render in the accent color.
 export const translations = {
   en: {
@@ -72,10 +72,16 @@ export const translations = {
     'about.title': 'About',
     'about.body':
       "I'm Ahmed, a frontend developer in Mansoura, Egypt. I design and code every site myself, in Arabic and English, and the goal never changes: look premium, load fast, and make it easy to get in touch.",
-    'about.stat.projects': 'Live projects',
-    'about.stat.industries': 'Industries',
-    'about.stat.languages': 'Languages, Arabic and English',
-    'about.tools': 'Tools I work with',
+    'about.facts': 'At a glance',
+    'about.fact.sites.label': 'Live sites',
+    'about.fact.sites.value': '{count}, and every one is open to visit',
+    'about.fact.industries.label': 'Industries',
+    'about.fact.industries.value':
+      'Medical clinics, perfume, skincare and product brands, interiors and architecture, weddings, and sports coaching',
+    'about.fact.languages.label': 'Languages',
+    'about.fact.languages.value': 'Arabic and English, with right-to-left layouts planned from the start',
+    'about.fact.stack.label': 'Built with',
+    'about.fact.stack.value': 'React, Tailwind CSS, Motion, and GSAP',
 
     'contact.title': 'Have a project in mind?',
     'contact.lead': 'Message me on WhatsApp, or put a brief together in under a minute.',
@@ -236,10 +242,16 @@ export const translations = {
     'about.title': 'عنّي',
     'about.body':
       'أنا أحمد، مطوّر واجهات من المنصورة. بصمّم وبكتب كود كل موقع بنفسي، بالعربي والإنجليزي، والهدف عمره ما بيتغيّر: شكل فخم، تحميل سريع، وتواصل سهل.',
-    'about.stat.projects': 'مشاريع لايف',
-    'about.stat.industries': 'مجالات',
-    'about.stat.languages': 'لغة: عربي وإنجليزي',
-    'about.tools': 'الأدوات اللي بشتغل بيها',
+    'about.facts': 'باختصار',
+    'about.fact.sites.label': 'مواقع لايف',
+    'about.fact.sites.value': '{count} مواقع، وكل واحد فيهم تقدر تفتحه وتجرّبه',
+    'about.fact.industries.label': 'المجالات',
+    'about.fact.industries.value':
+      'عيادات طبية، وبراندات عطور وعناية ومنتجات، وتصميم داخلي وعمارة، وتنظيم أفراح، وتدريب رياضي',
+    'about.fact.languages.label': 'اللغات',
+    'about.fact.languages.value': 'عربي وإنجليزي، والتصميم من اليمين للشمال محسوب من أول يوم',
+    'about.fact.stack.label': 'الأدوات',
+    'about.fact.stack.value': 'React، Tailwind CSS، Motion، GSAP',
 
     'contact.title': 'عندك مشروع في دماغك؟',
     'contact.lead': 'ابعتلي على واتساب، أو جهّز طلبك في أقل من دقيقة.',

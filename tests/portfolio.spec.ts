@@ -126,6 +126,16 @@ test.describe('work grid', () => {
   });
 });
 
+test.describe('about', () => {
+  test('states plain facts, with the live-site count taken from the data', async ({ page }) => {
+    await page.goto('/');
+    const facts = page.locator('#about dl');
+    await expect(facts.locator('dt')).toHaveCount(4);
+    await expect(facts).toContainText(`${PROJECT_COUNT}, and every one is open to visit`);
+    await expect(page.locator('.marquee')).toHaveCount(0);
+  });
+});
+
 test.describe('navigation', () => {
   test('the bar gains its surface once the page scrolls', async ({ page }) => {
     await page.goto('/');

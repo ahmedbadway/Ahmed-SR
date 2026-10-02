@@ -141,10 +141,6 @@ export const projects = [
   },
 ];
 
-// Distinct industries served, counted by hand and shown in About. Interiors and
-// architecture count as one; wedding planning was the seventh.
-export const INDUSTRY_COUNT = 7;
-
 // Optional chaining keeps this module importable from plain Node scripts
 // (screenshot tooling), where Vite's import.meta.env does not exist.
 const base = import.meta.env?.BASE_URL ?? '/';
