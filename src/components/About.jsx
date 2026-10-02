@@ -1,73 +1,110 @@
-import { m, useReducedMotion } from 'framer-motion';
-import { useCountUp } from '../hooks/useCountUp.js';
-import SectionHeading from './SectionHeading.jsx';
-import { projects } from '../data/projects.js';
+import { useEffect, useRef } from 'react';
 import { useLang } from '../i18n/LanguageProvider.jsx';
+import { useReveal } from '../hooks/useReveal.js';
+import { projects, INDUSTRY_COUNT } from '../data/projects.js';
 
-function StatNumber({ value, suffix = '' }) {
-  const { ref, count } = useCountUp(value);
+const TOOLS = [
+  'React',
+  'Vite',
+  'Tailwind CSS',
+  'Framer Motion',
+  'GSAP',
+  'Lenis',
+  'Phosphor Icons',
+  'Higgsfield AI',
+  'Playwright',
+  'GitHub Pages',
+  'Vercel',
+];
+
+// Single marquee on the page. The CSS loop pauses whenever the strip is off
+// screen, so it costs nothing while the visitor is elsewhere.
+function ToolsMarquee({ label }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) el.removeAttribute('data-paused');
+      else el.setAttribute('data-paused', '');
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const row = (hidden) =>
+    TOOLS.map((tool) => (
+      <li
+        key={`${hidden ? 'b' : 'a'}-${tool}`}
+        aria-hidden={hidden || undefined}
+        className={`${hidden ? 'marquee-dup ' : ''}flex items-center gap-10 pe-10 font-display text-[clamp(1.5rem,3vw,2.5rem)] font-medium tracking-tight text-faint`}
+      >
+        {tool}
+        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-gold-line" />
+      </li>
+    ));
+
   return (
-    <span ref={ref} className="font-display text-5xl font-bold tracking-tightest text-ink md:text-6xl">
-      {count}
-      {suffix}
-    </span>
+    // Tool names are Latin, so the strip always runs left to right.
+    <div ref={ref} dir="ltr" className="marquee overflow-hidden" data-paused="">
+      <ul aria-label={label} className="marquee-track">
+        {row(false)}
+        {row(true)}
+      </ul>
+    </div>
   );
 }
 
 export default function About() {
-  const reduce = useReducedMotion();
   const { t } = useLang();
+  const statsReveal = useReveal();
 
   const stats = [
-    { kind: 'num', value: projects.length, label: t('about.stat.projects') },
-    { kind: 'num', value: 7, label: t('about.stat.niches') },
-    { kind: 'text', value: t('about.stat.bilingualValue'), label: t('about.stat.bilingual') },
+    { value: projects.length, label: t('about.stat.projects') },
+    { value: INDUSTRY_COUNT, label: t('about.stat.industries') },
+    { value: 2, label: t('about.stat.languages') },
   ];
 
-  return (
-    <section id="about" className="cv-auto relative scroll-mt-24 py-28 md:py-36">
-      <div className="shell grid gap-14 lg:grid-cols-12 lg:gap-10">
-        <div className="lg:col-span-7">
-          <SectionHeading
-            eyebrow={t('about.eyebrow')}
-            title={t('about.title')}
-            underline
-          />
-          <m.p
-            initial={{ opacity: 0, y: reduce ? 0 : 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-8 max-w-[60ch] text-pretty text-lg leading-relaxed text-muted md:text-xl"
-          >
-            {t('about.body')}
-          </m.p>
-        </div>
+  // Each word lights up as the paragraph scrolls through the viewport (CSS
+  // view timeline). Words stay whole, so Arabic letter joining is preserved.
+  const words = t('about.body').split(' ');
 
-        {/* Stats — plain layout, no boxed cards (density stays low) */}
-        <div className="lg:col-span-5 lg:ps-10">
-          <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3 lg:grid-cols-1 lg:divide-y lg:divide-line">
-            {stats.map((s, i) => (
-              <m.div
-                key={s.label}
-                initial={{ opacity: 0, y: reduce ? 0 : 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.7, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                className="lg:py-7 lg:first:pt-0"
-              >
-                {s.kind === 'num' ? (
-                  <StatNumber value={s.value} />
-                ) : (
-                  <span className="font-display text-5xl font-bold tracking-tightest text-gold md:text-6xl">
-                    {s.value}
-                  </span>
-                )}
-                <p className="mt-2 text-sm text-faint">{s.label}</p>
-              </m.div>
-            ))}
-          </div>
-        </div>
+  return (
+    <section id="about" aria-labelledby="about-title" className="relative scroll-mt-24 py-28 md:py-40">
+      <div className="shell">
+        <h2 id="about-title" className="eyebrow">
+          {t('about.title')}
+        </h2>
+        <p className="mt-8 max-w-[30ch] font-display text-[clamp(1.75rem,3.6vw,3.25rem)] font-medium leading-[1.22] tracking-tight text-ink">
+          {words.map((w, i) => (
+            <span key={i} className="scrub-word">
+              {w}{' '}
+            </span>
+          ))}
+        </p>
+
+        <dl
+          ref={statsReveal}
+          data-reveal
+          className="mt-20 grid grid-cols-3 gap-6 border-t border-line pt-10 md:mt-28 md:gap-10"
+        >
+          {stats.map((s) => (
+            <div key={s.label}>
+              <dt className="sr-only">{s.label}</dt>
+              <dd className="font-display text-[clamp(2.75rem,7vw,6rem)] font-semibold leading-none tracking-display text-ink tabular-nums">
+                {s.value}
+              </dd>
+              <dd className="mt-3 max-w-[18ch] text-sm leading-snug text-muted md:text-base" aria-hidden="true">
+                {s.label}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
+      <div className="mt-24 md:mt-32">
+        <ToolsMarquee label={t('about.tools')} />
       </div>
     </section>
   );

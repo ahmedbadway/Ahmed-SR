@@ -1,61 +1,92 @@
 // Single source of truth for all UI copy in both languages.
-// Keyed by dotted namespace (e.g. 'nav.about'); see the t() helper in
+// Keyed by dotted namespace (e.g. 'nav.work'); see the t() helper in
 // LanguageProvider. Proper nouns (React, brand names, phone, email, @handles)
 // are intentionally NOT translated and stay literal in the components.
 // Project type/description translations live with the data in data/projects.js.
+// Strings may carry a `{year}` token that the component fills in. In
+// 'hero.title', words wrapped in *asterisks* render in the accent color.
 export const translations = {
   en: {
-    'nav.about': 'About',
     'nav.work': 'Work',
-    'nav.skills': 'Skills',
+    'nav.services': 'Services',
+    'nav.about': 'About',
     'nav.contact': 'Contact',
-    'nav.build': 'Build a Design',
-    'nav.home': 'Ahmed Badway — home',
+    'nav.cta': 'Start a project',
+    'nav.home': 'Ahmed Badway, home',
+    'nav.open': 'Open menu',
+    'nav.close': 'Close menu',
+    'nav.skip': 'Skip to content',
 
     'lang.switch': 'Switch language',
     'lang.en': 'English',
     'lang.ar': 'العربية',
 
-    'hero.eyebrow': 'Frontend Developer · Mansoura, Egypt',
-    'hero.name': 'AHMED BADWAY',
-    'hero.words': ['e-commerce stores', 'clinic websites', 'brand landings', 'portfolios'],
-    'hero.leadPrefix': 'I design & build premium',
-    'hero.viewWork': 'View Work',
-    'hero.contact': 'Contact',
-    'hero.orBuild': 'Or build your design',
-    'hero.scroll': 'Scroll',
+    'hero.kicker': 'Ahmed Badway, frontend developer in Egypt',
+    'hero.title': 'I build websites that look *expensive* and load *fast*.',
+    'hero.lead':
+      'Arabic and English sites for clinics, brands, and studios. Designed and coded by me, from first sketch to launch.',
+    'hero.primary': 'Start a project',
+    'hero.secondary': 'See the work',
+    'hero.visual': 'Screenshots of three websites built by Ahmed Badway',
 
-    'about.eyebrow': 'About',
-    'about.title': 'Premium work, without the agency price tag.',
+    'work.title': 'Selected work',
+    'work.lead':
+      'Every site here was designed from scratch and is live right now. Open any of them to see it working.',
+    'work.filter': 'Filter projects by industry',
+    'work.filter.all': 'All',
+    'work.filter.clinics': 'Clinics',
+    'work.filter.brands': 'Brands & stores',
+    'work.filter.studios': 'Studios & services',
+    'work.visit': 'Visit the live site (opens in a new tab)',
+
+    'services.title': 'What I build',
+    'services.lead':
+      'Four kinds of projects, one standard: clear on a phone, fluent in Arabic and English, and quick to load.',
+    'services.builtFor': 'Built for',
+    'services.clinics.title': 'Clinic and medical sites',
+    'services.clinics.body':
+      'Treatment pages that explain clearly, doctor profiles that build trust, and booking that is one WhatsApp tap away.',
+    'services.commerce.title': 'Stores and product brands',
+    'services.commerce.body':
+      'Collections, product pages, and carts that feel as considered as the product itself, in both languages.',
+    'services.studios.title': 'Studios and creative services',
+    'services.studios.body':
+      'Portfolios for architects, designers, and planners, where large imagery and quiet type let the work lead.',
+    'services.personal.title': 'Personal brands and coaching',
+    'services.personal.body':
+      'Multi-page sites for coaches and experts: programs, results, and a clear path to sign up.',
+
+    'process.title': 'How a project runs',
+    'process.brief.title': 'Brief',
+    'process.brief.body':
+      'You describe the project on WhatsApp or in the brief builder. I reply with scope, timeline, and a price.',
+    'process.direction.title': 'Direction',
+    'process.direction.body':
+      'I design the look first: type, color, layout, and motion, so you approve the feel before any code is written.',
+    'process.build.title': 'Build',
+    'process.build.body':
+      'Hand-coded in React, bilingual from the start, and checked on real phones for speed and layout.',
+    'process.launch.title': 'Launch',
+    'process.launch.body': 'I publish the site on your domain and hand it over, ready to share.',
+
+    'about.title': 'About',
     'about.body':
-      'I build premium websites for luxury brands, clinics, and e-commerce stores. Clean React code meets AI-generated visuals and cinematic animations — results that look expensive without the agency price tag.',
-    'about.stat.projects': 'Projects shipped',
-    'about.stat.niches': 'Industry niches',
-    'about.stat.bilingual': 'Bilingual delivery',
-    'about.stat.bilingualValue': 'AR · EN',
+      "I'm Ahmed, a frontend developer in Mansoura, Egypt. I design and code every site myself, in Arabic and English, and the goal never changes: look premium, load fast, and make it easy to get in touch.",
+    'about.stat.projects': 'Live projects',
+    'about.stat.industries': 'Industries',
+    'about.stat.languages': 'Languages, Arabic and English',
+    'about.tools': 'Tools I work with',
 
-    'projects.eyebrow': 'Selected Work',
-    'projects.title': 'Ten builds across luxury, beauty, and health.',
-    'projects.intro':
-      'Every site is custom — no templates. Browse with the arrows, then open any project to view it live.',
-    'projects.live': 'Live Site',
-
-    'skills.title': 'The toolkit behind the work.',
-    'skills.bilingual': 'Arabic / English',
-    'skills.mobile': 'Mobile-First',
-
-    'contact.eyebrow': 'Contact',
-    'contact.title': "Have a project in mind? Let's build it.",
-    'contact.lead':
-      'Available for freelance work — luxury brands, clinics, e-commerce, and beyond. Pick whichever channel suits you.',
-    'contact.call': 'Call',
-    'contact.whatsapp': 'WhatsApp',
-    'contact.whatsappValue': 'Message me directly',
+    'contact.title': 'Have a project in mind?',
+    'contact.lead': 'Message me on WhatsApp, or put a brief together in under a minute.',
+    'contact.whatsapp': 'Message on WhatsApp',
+    'contact.direct': 'Or reach me directly',
+    'contact.call': 'Phone',
     'contact.email': 'Email',
     'contact.instagram': 'Instagram',
     'contact.github': 'GitHub',
 
-    'footer.built': 'Built with React · Vite · Framer Motion',
+    'footer.rights': '© {year} Ahmed Badway',
     'footer.place': 'Mansoura, Egypt',
     'footer.top': 'Back to top',
 
@@ -64,7 +95,7 @@ export const translations = {
     'build.titleA': 'Build your',
     'build.titleB': 'design',
     'build.lead':
-      "Shape the brief in under a minute — pick the type, the mood, the colors, and the scope. When it looks right, send it straight to my WhatsApp and I'll reply with a tailored quote.",
+      "Shape the brief in under a minute: pick the type, the mood, the colors, and the scope. When it looks right, send it to my WhatsApp and I'll reply with a tailored quote.",
     'build.progress': 'complete',
     'build.q1': 'What are we building?',
     'build.q2': 'Pick a vibe',
@@ -76,6 +107,8 @@ export const translations = {
     'build.pagesOne': 'Single-page site',
     'build.pagesLarge': 'Large multi-page build',
     'build.pagesSome': 'sections / pages',
+    'build.pagesLess': 'Fewer pages',
+    'build.pagesMore': 'More pages',
     'build.preview': 'Live preview',
     'build.sumProject': 'Project',
     'build.sumVibe': 'Vibe',
@@ -87,10 +120,12 @@ export const translations = {
     'build.send': 'Send brief on WhatsApp',
     'build.copy': 'Copy brief instead',
     'build.copied': 'Copied to clipboard',
+    'build.copyFailed': 'Copy failed. Select the text and copy it manually.',
     'build.talk': 'Prefer to talk it through?',
     'build.contactOptions': 'See all contact options',
-    'build.namePlaceholder': 'Your name',
-    'build.notePlaceholder': 'A reference site, a deadline, a budget…',
+    'build.nameLabel': 'Your name',
+    'build.noteLabel': 'Notes',
+    'build.notePlaceholder': 'A reference site, a deadline, a budget',
     'build.none': 'Open to suggestions',
     'build.discuss': "Let's discuss",
 
@@ -113,8 +148,8 @@ export const translations = {
     'extra.booking': 'Booking System',
     'extra.cms': 'Blog / CMS',
     'extra.seo': 'SEO Setup',
-    'time.rush': 'Rush (1–2 wks)',
-    'time.standard': 'Standard (3–4 wks)',
+    'time.rush': 'Rush (1-2 wks)',
+    'time.standard': 'Standard (3-4 wks)',
     'time.flexible': 'Flexible',
     'palette.champagne': 'Champagne Noir',
     'palette.clinical': 'Clinical Fresh',
@@ -125,7 +160,7 @@ export const translations = {
     'palette.verdant': 'Verdant',
     'palette.violet': 'Violet Dusk',
 
-    'brief.header': 'Design brief — from ahmedbadway.github.io',
+    'brief.header': 'Design brief from ahmedbadway.github.io',
     'brief.project': 'Project',
     'brief.style': 'Style',
     'brief.palette': 'Palette',
@@ -137,57 +172,85 @@ export const translations = {
   },
 
   ar: {
-    'nav.about': 'نبذة',
     'nav.work': 'أعمالي',
-    'nav.skills': 'المهارات',
+    'nav.services': 'خدماتي',
+    'nav.about': 'عنّي',
     'nav.contact': 'تواصل',
-    'nav.build': 'ابنِ تصميمك',
-    'nav.home': 'أحمد بدوي — الرئيسية',
+    'nav.cta': 'ابدأ مشروعك',
+    'nav.home': 'أحمد بدوي، الرئيسية',
+    'nav.open': 'افتح القائمة',
+    'nav.close': 'اقفل القائمة',
+    'nav.skip': 'انتقل للمحتوى',
 
     'lang.switch': 'تغيير اللغة',
     'lang.en': 'English',
     'lang.ar': 'العربية',
 
-    'hero.eyebrow': 'مطوّر واجهات أمامية · المنصورة، مصر',
-    'hero.name': 'أحمد بدوي',
-    'hero.words': ['متاجر إلكترونية', 'مواقع عيادات', 'صفحات هبوط', 'بورتفوليو'],
-    'hero.leadPrefix': 'أُصمّم وأبني باحترافية',
-    'hero.viewWork': 'شوف الأعمال',
-    'hero.contact': 'تواصل معايا',
-    'hero.orBuild': 'أو ابنِ تصميمك',
-    'hero.scroll': 'انزل',
+    'hero.kicker': 'أحمد بدوي، مطوّر واجهات من مصر',
+    'hero.title': 'بعمل مواقع شكلها *غالي* وبتفتح *بسرعة*.',
+    'hero.lead':
+      'مواقع بالعربي والإنجليزي للعيادات والبراندات والاستوديوهات. بصمّمها وبكتب كودها بنفسي، من أول اسكتش لحد الإطلاق.',
+    'hero.primary': 'ابدأ مشروعك',
+    'hero.secondary': 'شوف الأعمال',
+    'hero.visual': 'صور لتلات مواقع من شغل أحمد بدوي',
 
-    'about.eyebrow': 'نبذة',
-    'about.title': 'شغل بريميوم، من غير أسعار الوكالات.',
+    'work.title': 'أعمال مختارة',
+    'work.lead': 'كل موقع هنا متصمّم من الصفر ومنشور لايف دلوقتي. افتح أي واحد وشوفه شغال.',
+    'work.filter': 'فلترة المشاريع حسب المجال',
+    'work.filter.all': 'الكل',
+    'work.filter.clinics': 'عيادات',
+    'work.filter.brands': 'براندات ومتاجر',
+    'work.filter.studios': 'استوديوهات وخدمات',
+    'work.visit': 'زيارة الموقع (بيفتح في تبويب جديد)',
+
+    'services.title': 'إيه اللي ببنيه',
+    'services.lead':
+      'أربع أنواع مشاريع ومعيار واحد: واضح على الموبايل، بيتكلم عربي وإنجليزي بطلاقة، وسريع في التحميل.',
+    'services.builtFor': 'اتعمل لـ',
+    'services.clinics.title': 'مواقع عيادات وطب',
+    'services.clinics.body':
+      'صفحات علاج بتشرح بوضوح، بروفايل دكتور بيبني ثقة، وحجز على بُعد ضغطة واتساب.',
+    'services.commerce.title': 'متاجر وبراندات منتجات',
+    'services.commerce.body':
+      'مجموعات وصفحات منتجات وعربة شراء متعوب عليها زي المنتج نفسه، باللغتين.',
+    'services.studios.title': 'استوديوهات وخدمات إبداعية',
+    'services.studios.body':
+      'بورتفوليو لمعماريين ومصممين ومنظمين، الصور الكبيرة والتايبوجرافي الهادي بيخلّوا الشغل هو اللي يتكلم.',
+    'services.personal.title': 'براندات شخصية وتدريب',
+    'services.personal.body':
+      'مواقع متعددة الصفحات للمدربين والخبراء: برامج ونتائج وطريق واضح للاشتراك.',
+
+    'process.title': 'المشروع بيمشي إزاي',
+    'process.brief.title': 'الطلب',
+    'process.brief.body':
+      'بتحكيلي عن المشروع على واتساب أو من صفحة "ابدأ مشروعك"، وبرد عليك بالنطاق والمدة والسعر.',
+    'process.direction.title': 'الاتجاه',
+    'process.direction.body':
+      'بصمّم الشكل الأول: الخطوط والألوان والتقسيم والحركة، عشان توافق على الإحساس قبل أي سطر كود.',
+    'process.build.title': 'التنفيذ',
+    'process.build.body':
+      'كود React مكتوب بإيدي، بلغتين من أول يوم، ومتجرّب على موبايلات حقيقية من ناحية السرعة والشكل.',
+    'process.launch.title': 'الإطلاق',
+    'process.launch.body': 'بنشر الموقع على الدومين بتاعك وبسلّمهولك جاهز للمشاركة.',
+
+    'about.title': 'عنّي',
     'about.body':
-      'بصمّم وأبني مواقع بريميوم للبراندات الفاخرة والعيادات والمتاجر الإلكترونية. كود React نضيف + بصريات مولّدة بالذكاء الاصطناعي وأنيميشن سينمائي — نتيجة شكلها غالي من غير أسعار الوكالات.',
-    'about.stat.projects': 'مشروع منجَز',
-    'about.stat.niches': 'مجالات مختلفة',
-    'about.stat.bilingual': 'تسليم بلغتين',
-    'about.stat.bilingualValue': 'عربي · إنجليزي',
+      'أنا أحمد، مطوّر واجهات من المنصورة. بصمّم وبكتب كود كل موقع بنفسي، بالعربي والإنجليزي، والهدف عمره ما بيتغيّر: شكل فخم، تحميل سريع، وتواصل سهل.',
+    'about.stat.projects': 'مشاريع لايف',
+    'about.stat.industries': 'مجالات',
+    'about.stat.languages': 'لغة: عربي وإنجليزي',
+    'about.tools': 'الأدوات اللي بشتغل بيها',
 
-    'projects.eyebrow': 'أعمال مختارة',
-    'projects.title': 'عشرة مواقع في الفخامة والجمال والصحة.',
-    'projects.intro':
-      'كل موقع مصمَّم من الصفر — من غير قوالب. تصفّح بالأسهم وافتح أي مشروع تشوفه لايف.',
-    'projects.live': 'زيارة الموقع',
-
-    'skills.title': 'الأدوات اللي ورا الشغل.',
-    'skills.bilingual': 'عربي / إنجليزي',
-    'skills.mobile': 'موبايل أولاً',
-
-    'contact.eyebrow': 'تواصل',
-    'contact.title': 'عندك مشروع في بالك؟ يلا نبنيه.',
-    'contact.lead':
-      'متاح للعمل الحر — براندات فاخرة، عيادات، متاجر إلكترونية وأكتر. اختار الوسيلة اللي تناسبك.',
-    'contact.call': 'اتصال',
-    'contact.whatsapp': 'واتساب',
-    'contact.whatsappValue': 'كلّمني على طول',
+    'contact.title': 'عندك مشروع في دماغك؟',
+    'contact.lead': 'ابعتلي على واتساب، أو جهّز طلبك في أقل من دقيقة.',
+    'contact.whatsapp': 'كلّمني على واتساب',
+    'contact.direct': 'أو تواصل معايا مباشرة',
+    'contact.call': 'تليفون',
     'contact.email': 'إيميل',
     'contact.instagram': 'إنستجرام',
-    'contact.github': 'جيت‌هَب',
+    'contact.github': 'جيت هَب',
 
-    'footer.built': 'مبني بـ React · Vite · Framer Motion',
+    'footer.rights': '© {year} أحمد بدوي',
     'footer.place': 'المنصورة، مصر',
     'footer.top': 'للأعلى',
 
@@ -196,7 +259,7 @@ export const translations = {
     'build.titleA': 'ابنِ',
     'build.titleB': 'تصميمك',
     'build.lead':
-      'جهّز طلبك في أقل من دقيقة — اختار النوع والطابع والألوان والحجم. لما يعجبك، ابعته على طول على واتساب وهرد عليك بعرض سعر مخصّص.',
+      'جهّز طلبك في أقل من دقيقة: اختار النوع والطابع والألوان والحجم. لما يعجبك، ابعته على واتساب وهرد عليك بعرض سعر مخصّص.',
     'build.progress': 'مكتمل',
     'build.q1': 'إحنا بنبني إيه؟',
     'build.q2': 'اختار الطابع',
@@ -208,6 +271,8 @@ export const translations = {
     'build.pagesOne': 'موقع صفحة واحدة',
     'build.pagesLarge': 'موقع متعدد الصفحات',
     'build.pagesSome': 'أقسام / صفحات',
+    'build.pagesLess': 'صفحات أقل',
+    'build.pagesMore': 'صفحات أكتر',
     'build.preview': 'معاينة حيّة',
     'build.sumProject': 'المشروع',
     'build.sumVibe': 'الطابع',
@@ -219,10 +284,12 @@ export const translations = {
     'build.send': 'ابعت الطلب على واتساب',
     'build.copy': 'انسخ الطلب بدل كده',
     'build.copied': 'اتنسخ للحافظة',
+    'build.copyFailed': 'النسخ مانجحش. حدّد النص وانسخه بإيدك.',
     'build.talk': 'تحب نتكلم بدل كده؟',
     'build.contactOptions': 'شوف كل وسائل التواصل',
-    'build.namePlaceholder': 'اسمك',
-    'build.notePlaceholder': 'موقع مرجعي، ديدلاين، ميزانية…',
+    'build.nameLabel': 'اسمك',
+    'build.noteLabel': 'ملاحظات',
+    'build.notePlaceholder': 'موقع مرجعي، ديدلاين، ميزانية',
     'build.none': 'مفتوح للاقتراحات',
     'build.discuss': 'نتفق على التفاصيل',
 
@@ -244,8 +311,8 @@ export const translations = {
     'extra.booking': 'نظام حجوزات',
     'extra.cms': 'مدونة / لوحة تحكم',
     'extra.seo': 'إعداد SEO',
-    'time.rush': 'مستعجل (1–2 أسبوع)',
-    'time.standard': 'قياسي (3–4 أسابيع)',
+    'time.rush': 'مستعجل (1-2 أسبوع)',
+    'time.standard': 'قياسي (3-4 أسابيع)',
     'time.flexible': 'مرن',
     'palette.champagne': 'شامبانيا نوار',
     'palette.clinical': 'نضارة طبية',
@@ -256,7 +323,7 @@ export const translations = {
     'palette.verdant': 'أخضر ناضر',
     'palette.violet': 'بنفسجي غسق',
 
-    'brief.header': 'طلب تصميم — من ahmedbadway.github.io',
+    'brief.header': 'طلب تصميم من ahmedbadway.github.io',
     'brief.project': 'المشروع',
     'brief.style': 'الطابع',
     'brief.palette': 'الألوان',

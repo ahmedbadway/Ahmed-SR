@@ -24,6 +24,9 @@ export function LanguageProvider({ children }) {
     const el = document.documentElement;
     el.lang = lang;
     el.dir = dir;
+    // index.html hides the prerendered (English) markup from returning Arabic
+    // visitors; the first committed render is the right moment to reveal it.
+    el.classList.remove('pre-ar');
     try {
       window.localStorage.setItem(STORAGE_KEY, lang);
     } catch {

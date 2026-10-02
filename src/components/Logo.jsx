@@ -22,7 +22,7 @@ export default function Logo({ withWordmark = true, className = '' }) {
         <path d="M30 24 H39 a6.5 6.5 0 0 1 0 12 H30" className="stroke-gold" />
       </svg>
       {withWordmark ? (
-        <span className="hidden font-display text-base font-bold tracking-tightest text-ink sm:inline">
+        <span className="hidden font-display text-[0.975rem] font-semibold tracking-tight text-ink sm:inline">
           Ahmed Badway
         </span>
       ) : null}
