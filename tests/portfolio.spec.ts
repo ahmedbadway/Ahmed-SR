@@ -1,19 +1,26 @@
 import { test, expect } from '@playwright/test';
 
-// Whether the current project's device advertises a hover-capable pointer.
-// The card interaction branches on exactly this, so the tests do too — the
-// desktop projects satisfy it, the Mobile Chrome project does not.
-const canHover = (page) =>
-  page.evaluate(() => window.matchMedia('(hover: hover) and (pointer: fine)').matches);
-
-// End-to-end coverage for the portfolio. The dev server (vite preview) is
+// End-to-end coverage for the portfolio. The server (build + vite preview) is
 // started automatically by playwright.config.ts, which also serves the app
 // under the GitHub-Pages base path, so every test just goes to '/'.
 
+const PROJECT_COUNT = 10;
+
+// Real wheel input, not a raw scrollTo jump: Lenis drives window.scrollY from
+// wheel events the same way it does for a visitor.
+async function wheelDown(page, steps = 12, delta = 400) {
+  await page.mouse.move(200, 200);
+  for (let i = 0; i < steps; i++) {
+    await page.mouse.wheel(0, delta);
+    await page.waitForTimeout(60);
+  }
+}
+
 test.describe('page shell', () => {
-  test('loads with the correct title and no horizontal overflow', async ({ page }) => {
+  test('loads with the correct title, meta, and no horizontal overflow', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveTitle(/Ahmed Badway/);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /og\.jpg$/);
 
     const { doc, win } = await page.evaluate(() => ({
       doc: document.documentElement.scrollWidth,
@@ -22,163 +29,190 @@ test.describe('page shell', () => {
     expect(doc).toBeLessThanOrEqual(win + 1);
   });
 
+  test('ships prerendered HTML so content paints before JavaScript', async ({ request }) => {
+    const res = await request.get('/');
+    const html = await res.text();
+    expect(html).toContain('id="work"');
+    expect(html).toContain('Selected work');
+    expect(html).toMatch(/rel="preload"[^>]+geist-latin/);
+  });
+
   test('has no animated background layers and no canvas', async ({ page }) => {
     await page.goto('/');
+    await expect(page.locator('.site-backdrop')).toHaveCount(1);
     await expect(page.locator('.gradient-mesh')).toHaveCount(0);
     await expect(page.locator('canvas')).toHaveCount(0);
   });
 
-  test('primary navigation reaches every section', async ({ page }) => {
+  test('every home section exists once', async ({ page }) => {
     await page.goto('/');
-    for (const id of ['about', 'projects', 'skills', 'contact']) {
+    for (const id of ['hero', 'work', 'services', 'about', 'contact']) {
       await expect(page.locator(`#${id}`)).toHaveCount(1);
     }
   });
-});
 
-test.describe('project fan carousel', () => {
-  test('renders every project card and a details panel for the centered one', async ({ page }) => {
+  test('logs no errors while scrolling the whole page', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
     await page.goto('/');
-    const section = page.locator('#projects');
-    await section.scrollIntoViewIfNeeded();
-
-    await expect(section.locator('.fan-card')).toHaveCount(10);
-    await expect(section.locator('h3').first()).toBeVisible();
-    await expect(section.getByRole('link', { name: /Live Site/i })).toBeVisible();
-  });
-
-  test('the Next arrow advances the fan (hover-capable devices)', async ({ page }) => {
-    await page.goto('/');
-    test.skip(!(await canHover(page)), 'no hover pointer — fan swipes instead of arrows');
-
-    const section = page.locator('#projects');
-    await section.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(2200); // let the entry animation settle (worst case ~1.76s)
-
-    const nameBefore = await section.locator('h3').first().textContent();
-    await section.getByRole('button', { name: 'Next' }).click();
-    await expect
-      .poll(async () => section.locator('h3').first().textContent())
-      .not.toBe(nameBefore);
-  });
-
-  test('the Previous arrow cycles the fan backwards (hover-capable devices)', async ({ page }) => {
-    await page.goto('/');
-    test.skip(!(await canHover(page)), 'no hover pointer — fan swipes instead of arrows');
-
-    const section = page.locator('#projects');
-    await section.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(2200);
-
-    const nameBefore = await section.locator('h3').first().textContent();
-    await section.getByRole('button', { name: 'Previous' }).click();
-    await expect
-      .poll(async () => section.locator('h3').first().textContent())
-      .not.toBe(nameBefore);
-  });
-
-  test('shows no arrow buttons on touch devices', async ({ page }) => {
-    await page.goto('/');
-    test.skip(await canHover(page), 'hover pointer — fan uses arrow buttons instead');
-
-    const section = page.locator('#projects');
-    await section.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(2200);
-
-    await expect(section.getByRole('button', { name: /Previous|Next/ })).toHaveCount(0);
-  });
-
-  test('a swipe gesture advances the fan (touch devices)', async ({ page }) => {
-    await page.goto('/');
-    test.skip(await canHover(page), 'hover pointer — fan uses arrow buttons instead');
-
-    const section = page.locator('#projects');
-    await section.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(2200);
-
-    const nameBefore = await section.locator('h3').first().textContent();
-    // Dispatch touch-typed PointerEvents directly rather than page.mouse
-    // (which emulates an actual mouse and would itself flip Chromium's
-    // dynamic hover-capability detection — not something a real touch-only
-    // visitor's browser would ever do).
-    await page.evaluate(() => {
-      const el = document.querySelector('.fan-layout');
-      const rect = el.getBoundingClientRect();
-      const midY = rect.top + rect.height / 2;
-      const startX = rect.left + rect.width * 0.75;
-      const endX = rect.left + rect.width * 0.25;
-      const fire = (type, x, y) =>
-        el.dispatchEvent(
-          new PointerEvent(type, {
-            bubbles: true,
-            cancelable: true,
-            pointerId: 1,
-            pointerType: 'touch',
-            clientX: x,
-            clientY: y,
-            isPrimary: true,
-          })
-        );
-      fire('pointerdown', startX, midY);
-      for (let i = 1; i <= 6; i++) fire('pointermove', startX + ((endX - startX) * i) / 6, midY);
-      fire('pointerup', endX, midY);
-    });
-
-    await expect
-      .poll(async () => section.locator('h3').first().textContent())
-      .not.toBe(nameBefore);
+    await wheelDown(page, 40);
+    expect(errors).toEqual([]);
   });
 });
 
-test.describe('floating build CTA', () => {
-  const cta = (page) => page.locator('.fixed.bottom-6.end-6 button');
-
-  test('is hidden at the top of the Hero, then appears past it', async ({ page }) => {
+test.describe('hero', () => {
+  test('primary CTA opens the Build Your Design studio', async ({ page }) => {
     await page.goto('/');
-    await expect(cta(page)).toBeHidden();
-
-    // Real wheel input, not a raw scrollTo jump — Lenis's smooth-scroll rAF
-    // loop drives window.scrollY the same way a real visitor's scroll would.
-    for (let i = 0; i < 12; i++) {
-      await page.mouse.wheel(0, 400);
-      await page.waitForTimeout(80);
-    }
-    await expect(cta(page)).toBeVisible();
-  });
-
-  test('navigates to the Build Your Design studio and then hides itself', async ({ page }) => {
-    await page.goto('/');
-    for (let i = 0; i < 12; i++) {
-      await page.mouse.wheel(0, 400);
-      await page.waitForTimeout(80);
-    }
-    await cta(page).click();
+    await page.locator('#hero').getByRole('button', { name: 'Start a project' }).click();
     await expect(page).toHaveURL(/#\/build$/);
-    await expect(cta(page)).toBeHidden();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Build your');
   });
 
-  test('expands to a text pill on hover (hover-capable devices)', async ({ page }) => {
+  test('secondary CTA scrolls to the work grid', async ({ page }) => {
     await page.goto('/');
-    test.skip(!(await canHover(page)), 'no hover pointer — CTA stays a compact circle');
-
-    for (let i = 0; i < 12; i++) {
-      await page.mouse.wheel(0, 400);
-      await page.waitForTimeout(80);
-    }
-    const button = cta(page);
-    const before = await button.boundingBox();
-    await button.hover();
+    await page.locator('#hero').getByRole('button', { name: 'See the work' }).click();
     await expect
-      .poll(async () => (await button.boundingBox()).width)
-      .toBeGreaterThan(before.width + 20);
+      .poll(async () => page.evaluate(() => document.getElementById('work').getBoundingClientRect().top))
+      .toBeLessThan(200);
+  });
+});
+
+test.describe('work grid', () => {
+  test('lists every project as a link to its live site', async ({ page }) => {
+    await page.goto('/');
+    const cards = page.locator('#work ul > li');
+    await expect(cards).toHaveCount(PROJECT_COUNT);
+
+    const first = cards.first().getByRole('link');
+    await expect(first).toHaveAttribute('href', /^https:\/\//);
+    await expect(first).toHaveAttribute('target', '_blank');
+    await expect(first).toHaveAttribute('rel', /noopener/);
   });
 
-  test('stays a compact icon with no text pill on touch devices', async ({ page }) => {
+  test('cards reveal once scrolled into view', async ({ page }) => {
     await page.goto('/');
-    test.skip(await canHover(page), 'hover pointer — CTA expands on hover');
+    const firstCard = page.locator('#work ul > li a').first();
+    await firstCard.scrollIntoViewIfNeeded();
+    await expect(firstCard).toHaveAttribute('data-in', '');
+    await expect(firstCard).toHaveCSS('opacity', '1');
+  });
 
-    await page.evaluate(() => window.scrollTo(0, window.innerHeight * 1.2));
-    const box = await cta(page).boundingBox();
-    expect(box.width).toBeLessThan(70);
+  test('filters narrow the grid and "All" restores it', async ({ page }) => {
+    await page.goto('/');
+    const filters = page.getByRole('group', { name: /Filter projects/ });
+    const cards = page.locator('#work ul > li');
+
+    await filters.getByRole('button', { name: /Clinics/ }).click();
+    await expect(cards).toHaveCount(2);
+    await expect(filters.getByRole('button', { name: /Clinics/ })).toHaveAttribute('aria-pressed', 'true');
+
+    await filters.getByRole('button', { name: /Studios/ }).click();
+    await expect(cards).toHaveCount(4);
+
+    await filters.getByRole('button', { name: /^All/ }).click();
+    await expect(cards).toHaveCount(PROJECT_COUNT);
+  });
+
+  test('every cover image loads', async ({ page }) => {
+    await page.goto('/');
+    await wheelDown(page, 30);
+    const broken = await page.evaluate(() =>
+      [...document.querySelectorAll('#work img')]
+        .filter((img) => img.complete && img.naturalWidth === 0)
+        .map((img) => img.currentSrc || img.src)
+    );
+    expect(broken).toEqual([]);
+  });
+});
+
+test.describe('navigation', () => {
+  test('the bar gains its surface once the page scrolls', async ({ page }) => {
+    await page.goto('/');
+    const nav = page.getByRole('navigation', { name: 'Primary' });
+    await expect(nav).toHaveClass(/border-transparent/);
+    await wheelDown(page, 4);
+    await expect(nav).toHaveClass(/bg-surface/);
+  });
+
+  test('desktop links mark the section in view', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'desktop link row is hidden on phones');
+    await page.goto('/');
+    const nav = page.getByRole('navigation', { name: 'Primary' });
+    await nav.getByRole('button', { name: 'Services' }).click();
+    await expect(nav.getByRole('button', { name: 'Services' })).toHaveAttribute('aria-current', 'location');
+  });
+
+  test('mobile menu opens, links, and closes', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'the sheet only exists below md');
+    await page.goto('/');
+    const toggle = page.getByRole('button', { name: 'Open menu' });
+    await toggle.click();
+    const sheet = page.locator('#mobile-menu');
+    await expect(sheet).toHaveAttribute('aria-hidden', 'false');
+    await sheet.getByRole('button', { name: 'Contact' }).click();
+    await expect(sheet).toHaveAttribute('aria-hidden', 'true');
+    await expect
+      .poll(async () => page.evaluate(() => document.getElementById('contact').getBoundingClientRect().top))
+      .toBeLessThan(200);
+  });
+});
+
+test.describe('language', () => {
+  test('switches to Arabic with RTL and persists across reloads', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'العربية' }).first().click();
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+    await expect(page.locator('#work h2')).toHaveText('أعمال مختارة');
+
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.locator('#work h2')).toHaveText('أعمال مختارة');
+    await expect(page.locator('html')).not.toHaveClass(/pre-ar/);
+  });
+});
+
+test.describe('contact', () => {
+  test('offers WhatsApp plus direct channels', async ({ page }) => {
+    await page.goto('/');
+    const section = page.locator('#contact');
+    await expect(section.getByRole('link', { name: 'Message on WhatsApp' })).toHaveAttribute(
+      'href',
+      /^https:\/\/wa\.me\/\d+$/
+    );
+    await expect(section.locator('a[href^="tel:"]')).toHaveCount(1);
+    await expect(section.locator('a[href^="mailto:"]')).toHaveCount(1);
+  });
+});
+
+test.describe('build your design studio', () => {
+  test('progress and WhatsApp brief reflect the chosen options', async ({ page }) => {
+    await page.goto('/#/build');
+    // Capture the URL instead of letting the test leave for wa.me.
+    await page.evaluate(() => {
+      window.open = (url) => {
+        window.__openedUrl = url;
+        return null;
+      };
+    });
+    await page.getByRole('button', { name: /Clinic \/ Medical/ }).click();
+    await page.getByRole('button', { name: 'Luxury' }).click();
+    await expect(page.getByRole('progressbar')).not.toHaveAttribute('aria-valuenow', '0');
+
+    await page.getByLabel('Your name').fill('Mona Fathy');
+    await page.getByRole('button', { name: 'Send brief on WhatsApp' }).click();
+    const url = decodeURIComponent(await page.evaluate(() => window.__openedUrl));
+    expect(url).toMatch(/^https:\/\/wa\.me\/\d+\?text=/);
+    expect(url).toContain('Clinic / Medical');
+    expect(url).toContain('Luxury');
+    expect(url).toContain('Mona Fathy');
+  });
+
+  test('page-count stepper respects its bounds', async ({ page }) => {
+    await page.goto('/#/build');
+    const less = page.getByRole('button', { name: 'Fewer pages' });
+    for (let i = 0; i < 6; i++) await less.click({ force: true });
+    await expect(less).toBeDisabled();
   });
 });
