@@ -1,25 +1,19 @@
 #!/bin/bash
-# Ahmed Badway — Setup Script
-# Claude Code Web
+# Ahmed Badway: setup script for Claude Code Web.
+# CLAUDE.md is committed to the repo, so nothing is fetched here.
 
-echo "🌊 Setting up project..."
+echo "Setting up project..."
 
-# 1. Fetch CLAUDE.md from GitHub
-echo "📥 Loading CLAUDE.md..."
-curl -s https://raw.githubusercontent.com/ahmedbadway/your-actual-repo/main/CLAUDE.md > CLAUDE.md
-
-# 2. Install dependencies
 if [ -f "package.json" ]; then
-  echo "📦 Installing packages..."
-  npm install
-  npm install motion
-  npm install -D @playwright/test
-  echo "✅ Dependencies ready"
+  echo "Installing packages..."
+  # --include=dev: the cloud environment sets NODE_ENV=production, which
+  # would otherwise skip Vite, Tailwind, ESLint, and Playwright.
+  npm ci --include=dev
+  echo "Dependencies ready"
 else
-  echo "⚠️  No package.json — Claude Code will scaffold first"
+  echo "No package.json: Claude Code will scaffold first"
 fi
 
 echo ""
-echo "✅ Setup complete!"
+echo "Setup complete."
 echo "Run E2E tests: npm run test:e2e"
-echo "Remember: Work on main branch only. No new branches."
