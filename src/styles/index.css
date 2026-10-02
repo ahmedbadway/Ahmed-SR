@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* AB Sans: Mona Sans (SIL OFL 1.1, license in src/assets/fonts/OFL.txt),
+   Latin subset, instanced to width 100-125% and weight 400-700 (98KB down to
+   65KB) and renamed as the OFL's Reserved Font Name clause requires for a
+   modified version. One file sets running text at normal width and display
+   type widened. To regenerate, run fontTools' varLib.instancer on the Mona
+   Sans Latin variable woff2 (wdth 100:125, wght 400:700) and rename the
+   family. Non-Latin glyphs fall through to the next face in the stack. */
+@font-face {
+  font-family: 'AB Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 700;
+  font-stretch: 100% 125%;
+  src: url('../assets/fonts/AbSansLatin.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* ============================================================
    Design tokens: single OKLCH source of truth.
    Dark-luxury theme: cool off-black base, one champagne-gold accent.
@@ -30,6 +48,9 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* AB Sans width for display type (100% = normal, 125% = expanded). */
+  --display-stretch: 125%;
 
   /* Layering scale: every z-index on the site comes from here. */
   --z-backdrop: 0;
@@ -69,23 +90,32 @@ body {
   margin: 0;
   background-color: var(--bg);
   color: var(--text);
-  font-family: 'Geist Variable', 'Alexandria Variable', system-ui, sans-serif;
-  font-feature-settings: 'ss01';
+  font-family: 'AB Sans', 'Alexandria Variable', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overflow-x: clip;
 }
 
-/* Arabic: Alexandria sets every glyph. Latin display tracking is tuned for
-   Geist and would cramp Arabic letterforms, so it relaxes under RTL. */
-html[dir='rtl'] body {
-  font-family: 'Alexandria Variable', 'Geist Variable', system-ui, sans-serif;
+/* Display type is the same family, widened on its width axis: one
+   voice for the page, with headlines that read as set rather than typed.
+   Reem Kufi (Arabic) has no width axis and is unaffected. */
+.font-display {
+  font-stretch: var(--display-stretch);
 }
+
+/* Latin display tracking is tuned for AB Sans and would cramp Arabic
+   letterforms, so it relaxes under RTL. */
 html[dir='rtl'] .tracking-display,
 html[dir='rtl'] .tracking-tight,
 html[dir='rtl'] .tracking-tighter {
   letter-spacing: 0;
+}
+/* Geist Mono has no Arabic, and its fixed-width space would gap Arabic words
+   apart, so mono labels set in Alexandria under RTL. Latin-only runs (marked
+   dir="ltr") keep the mono face. */
+html[dir='rtl'] :is(.font-mono, .eyebrow):not([dir='ltr']) {
+  font-family: 'Alexandria Variable', system-ui, sans-serif;
 }
 /* Arabic letterforms stack taller ascenders and dots than Latin, so display
    headings need more leading than the tight Latin setting. */
@@ -146,15 +176,14 @@ html.pre-ar #root {
       0 24px 60px -32px var(--shadow-deep);
   }
 
+  /* Small label above a headline: mono, sentence case, no wide tracking. */
   .eyebrow {
-    font-size: 0.75rem;
+    font-family: theme('fontFamily.mono');
+    font-size: 0.8125rem;
     font-weight: 500;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
     color: var(--gold);
   }
   html[dir='rtl'] .eyebrow {
-    letter-spacing: 0;
     font-size: 0.875rem;
   }
 

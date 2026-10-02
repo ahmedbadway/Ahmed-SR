@@ -34,7 +34,7 @@ test.describe('page shell', () => {
     const html = await res.text();
     expect(html).toContain('id="work"');
     expect(html).toContain('Selected work');
-    expect(html).toMatch(/rel="preload"[^>]+geist-latin/);
+    expect(html).toMatch(/rel="preload"[^>]+AbSansLatin/);
   });
 
   test('has no animated background layers and no canvas', async ({ page }) => {

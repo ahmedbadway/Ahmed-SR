@@ -69,7 +69,7 @@ function WorkCard({ project, index, isAr, visitLabel }) {
         <p className="mt-3 max-w-[54ch] text-pretty text-[0.95rem] leading-relaxed text-muted">
           {description}
         </p>
-        <p className="mt-3 text-xs tracking-wide text-faint rtl:text-right" dir="ltr">
+        <p className="mt-3 font-mono text-xs text-faint rtl:text-right" dir="ltr">
           {project.tech.join(', ')}
         </p>
       </a>

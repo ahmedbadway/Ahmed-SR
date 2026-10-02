@@ -1,11 +1,14 @@
 import React from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
-// Self-hosted variable fonts (no runtime Google <link>). Geist sets Latin
-// text; Arabic glyphs fall through to Alexandria via unicode-range, so the
-// Arabic file only downloads when Arabic text is on screen.
-import '@fontsource-variable/geist';
+// Self-hosted variable fonts (no runtime Google <link>). AB Sans (declared in
+// index.css) sets all Latin text, and its width axis turns the same family
+// into the display face. Arabic glyphs fall through via unicode-range (Reem
+// Kufi for headings, Alexandria for text), so the Arabic files only download
+// when Arabic is on screen. Geist Mono sets small figures and labels.
+import '@fontsource-variable/reem-kufi';
 import '@fontsource-variable/alexandria';
+import '@fontsource-variable/geist-mono';
 
 import App from './App.jsx';
 import { LanguageProvider } from './i18n/LanguageProvider.jsx';

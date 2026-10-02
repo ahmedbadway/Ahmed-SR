@@ -25,13 +25,17 @@ export default {
         'gold-line': 'color-mix(in oklch, var(--gold) 50%, transparent)',
       },
       fontFamily: {
-        // Geist covers Latin; Arabic glyphs fall through to Alexandria via
-        // unicode-range, so one stack serves both languages.
-        display: ['"Geist Variable"', '"Alexandria Variable"', 'system-ui', 'sans-serif'],
-        sans: ['"Geist Variable"', '"Alexandria Variable"', 'system-ui', 'sans-serif'],
+        // AB Sans (index.css) covers Latin only, so Arabic glyphs fall through
+        // to the next face via unicode-range and one stack serves both
+        // languages: Reem Kufi for display, Alexandria for running text.
+        // `font-display` also widens AB Sans (font-stretch, set in index.css).
+        display: ['"AB Sans"', '"Reem Kufi Variable"', 'system-ui', 'sans-serif'],
+        sans: ['"AB Sans"', '"Alexandria Variable"', 'system-ui', 'sans-serif'],
+        // Labels and figures. Arabic labels switch to Alexandria (index.css).
+        mono: ['"Geist Mono Variable"', 'ui-monospace', 'monospace'],
       },
       letterSpacing: {
-        display: '-0.045em',
+        display: '-0.025em',
       },
       maxWidth: {
         shell: '1400px',

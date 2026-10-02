@@ -7,13 +7,12 @@ function Step({ step, index, t }) {
   const reveal = useReveal();
   return (
     <li ref={reveal} data-reveal style={{ '--i': index }} className="relative">
-      <span
-        aria-hidden="true"
-        className="grid h-10 w-10 place-items-center rounded-full border border-gold-line bg-bg text-sm font-semibold tabular-nums text-gold"
-      >
-        {index + 1}
+      {/* The list is an <ol>, so the order is already announced; the figure
+          is for the eye only. */}
+      <span aria-hidden="true" className="block font-mono text-sm tabular-nums text-gold">
+        {String(index + 1).padStart(2, '0')}
       </span>
-      <h3 className="mt-6 font-display text-2xl font-semibold tracking-tight text-ink">
+      <h3 className="mt-12 font-display text-2xl font-semibold tracking-tight text-ink">
         {t(`process.${step}.title`)}
       </h3>
       <p className="mt-3 max-w-[34ch] text-pretty leading-relaxed text-muted">
@@ -41,10 +40,11 @@ export default function Process() {
 
         <div className="relative mt-16 md:mt-20">
           {/* The rail draws itself as the row scrolls into view (CSS view
-              timeline). It sits behind the step markers on wide screens. */}
+              timeline). It runs between the step figures and the titles on
+              wide screens. */}
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 top-5 hidden h-px bg-line lg:block"
+            className="absolute inset-x-0 top-[2.6rem] hidden h-px bg-line lg:block"
           >
             <div className="process-line h-full w-full bg-gold-line" />
           </div>

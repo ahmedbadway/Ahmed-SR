@@ -26,7 +26,7 @@ function ServiceRow({ service, t }) {
       </p>
 
       <div className="mt-7">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-faint rtl:tracking-normal">
+        <p className="font-mono text-xs text-faint">
           {t('services.builtFor')}
         </p>
         <ul className="mt-3 flex flex-wrap gap-2.5">
