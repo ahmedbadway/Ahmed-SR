@@ -22,9 +22,9 @@ export const translations = {
     'lang.ar': 'العربية',
 
     'hero.kicker': 'Ahmed Badway, frontend developer in Egypt',
-    'hero.title': 'I build websites that look *expensive* and load *fast*.',
+    'hero.title': 'Websites with *personality*, not templates.',
     'hero.lead':
-      'Arabic and English sites for clinics, brands, and studios. Designed and coded by me, from first sketch to launch.',
+      'Each one designed from scratch, in Arabic and English, for clinics, brands, and studios. From the first idea until it goes live.',
     'hero.primary': 'Start a project',
     'hero.secondary': 'See the work',
     'hero.visual': 'Screenshots of three websites built by Ahmed Badway',
@@ -187,9 +187,9 @@ export const translations = {
     'lang.ar': 'العربية',
 
     'hero.kicker': 'أحمد بدوي، مطوّر واجهات من مصر',
-    'hero.title': 'بعمل مواقع شكلها *غالي* وبتفتح *بسرعة*.',
+    'hero.title': 'مواقع ليها *شخصية*، مش قوالب جاهزة.',
     'hero.lead':
-      'مواقع بالعربي والإنجليزي للعيادات والبراندات والاستوديوهات. بصمّمها وبكتب كودها بنفسي، من أول اسكتش لحد الإطلاق.',
+      'كل موقع بصمّمه من الصفر، بالعربي والإنجليزي، للعيادات والبراندات والاستوديوهات. من أول فكرة لحد ما يبقى لايف.',
     'hero.primary': 'ابدأ مشروعك',
     'hero.secondary': 'شوف الأعمال',
     'hero.visual': 'صور لتلات مواقع من شغل أحمد بدوي',
