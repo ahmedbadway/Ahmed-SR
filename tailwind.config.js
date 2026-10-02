@@ -12,8 +12,6 @@ export default {
         surface: 'var(--surface)',
         'surface-2': 'var(--surface-2)',
         gold: 'var(--gold)',
-        'gold-soft': 'var(--gold-soft)',
-        'gold-dim': 'var(--gold-dim)',
         ink: 'var(--text)',
         muted: 'var(--text-muted)',
         faint: 'var(--text-faint)',
@@ -37,9 +35,6 @@ export default {
       letterSpacing: {
         display: '-0.025em',
       },
-      maxWidth: {
-        shell: '1400px',
-      },
       borderRadius: {
         // Shape system: buttons are full pills, media and panels use `card`,
         // inputs use `field`.
@@ -52,7 +47,6 @@ export default {
       },
       transitionTimingFunction: {
         out: 'var(--ease-out)',
-        'in-out': 'var(--ease-in-out)',
       },
     },
   },
