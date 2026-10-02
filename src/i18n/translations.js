@@ -38,6 +38,8 @@ export const translations = {
     'work.filter.brands': 'Brands & stores',
     'work.filter.studios': 'Studios & services',
     'work.visit': 'Visit the live site (opens in a new tab)',
+    'work.index': 'Every project',
+    'work.index.lead': 'The full list. Hover a name to preview it, or open it live.',
 
     'services.title': 'What I build',
     'services.lead':
@@ -208,6 +210,8 @@ export const translations = {
     'work.filter.brands': 'براندات ومتاجر',
     'work.filter.studios': 'استوديوهات وخدمات',
     'work.visit': 'زيارة الموقع (بيفتح في تبويب جديد)',
+    'work.index': 'كل المشاريع',
+    'work.index.lead': 'القائمة كاملة. عدّي على أي اسم تشوف شكله، أو افتحه لايف.',
 
     'services.title': 'إيه اللي ببنيه',
     'services.lead':

@@ -403,7 +403,8 @@ html[dir='rtl'] .process-line {
 }
 
 /* ============================================================
-   Work filter: View Transitions morph the grid when the filter changes.
+   Project index filter: View Transitions morph the rows when the filter
+   changes.
    ============================================================ */
 ::view-transition-group(*) {
   animation-duration: 420ms;
