@@ -2,7 +2,7 @@
 //
 // `vite build` emits the client bundle; `vite build --ssr` emits
 // dist-ssr/EntryServer.js. This script renders the app to HTML, injects it
-// into the root element, preloads the Latin Geist font the hero needs,
+// into the root element, preloads the Latin AB Sans font the hero needs,
 // inlines the stylesheet, and removes the temporary SSR output. The client then hydrates that markup
 // (src/main.jsx), so the first paint no longer waits for JavaScript.
 import { readFile, writeFile, readdir, rm } from 'node:fs/promises';
@@ -23,14 +23,14 @@ if (!html.includes('<div id="root"></div>')) {
 }
 html = html.replace('<div id="root"></div>', () => `<div id="root">${appHtml}</div>`);
 
-// Preload the Latin Geist face so the headline renders in its real font on
+// Preload the Latin AB Sans face so the headline renders in its real font on
 // the first paint instead of swapping in later.
 const assets = await readdir(path.join(distDir, 'assets'));
-const geist = assets.find((f) => /^geist-latin-wght-normal-.*\.woff2$/.test(f));
-if (geist) {
+const font = assets.find((f) => /^AbSansLatin-.*\.woff2$/.test(f));
+if (font) {
   // Reuse the deploy base Vite already wrote into the entry script's URL.
   const base = html.match(/src="(\/[^"]*?)assets\//)?.[1] ?? '/';
-  const preload = `<link rel="preload" href="${base}assets/${geist}" as="font" type="font/woff2" crossorigin />`;
+  const preload = `<link rel="preload" href="${base}assets/${font}" as="font" type="font/woff2" crossorigin />`;
   html = html.replace('</title>', `</title>\n    ${preload}`);
 }
 
@@ -49,5 +49,5 @@ await writeFile(indexPath, html);
 await rm(ssrDir, { recursive: true, force: true });
 
 console.log(
-  `prerender: wrote ${(appHtml.length / 1024).toFixed(1)}KB of markup${geist ? `, preloaded ${geist}` : ''}`
+  `prerender: wrote ${(appHtml.length / 1024).toFixed(1)}KB of markup${font ? `, preloaded ${font}` : ''}`
 );

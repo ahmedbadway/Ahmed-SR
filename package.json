@@ -25,7 +25,8 @@
   },
   "devDependencies": {
     "@fontsource-variable/alexandria": "^5.3.0",
-    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "@fontsource-variable/reem-kufi": "^5.3.0",
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.0",
     "@vitejs/plugin-react": "^4.3.3",

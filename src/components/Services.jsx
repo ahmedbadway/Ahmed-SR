@@ -2,7 +2,7 @@ import { ArrowUpRight } from '@phosphor-icons/react';
 import { useLang } from '../i18n/LanguageProvider.jsx';
 import { useReveal } from '../hooks/useReveal.js';
 import { navigate } from '../hooks/useHashRoute.js';
-import { projects, coverSrc } from '../data/projects.js';
+import { projects, coverSmall } from '../data/projects.js';
 
 // Each service links to the real projects that prove it.
 const SERVICES = [
@@ -26,7 +26,7 @@ function ServiceRow({ service, t }) {
       </p>
 
       <div className="mt-7">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-faint rtl:tracking-normal">
+        <p className="font-mono text-xs text-faint">
           {t('services.builtFor')}
         </p>
         <ul className="mt-3 flex flex-wrap gap-2.5">
@@ -39,7 +39,7 @@ function ServiceRow({ service, t }) {
                 className="group flex items-center gap-3 rounded-full border border-line py-1.5 pe-4 ps-1.5 text-sm text-ink transition-[border-color,transform] duration-200 ease-out active:scale-[0.97] can-hover:hover:border-gold-line"
               >
                 <img
-                  src={coverSrc(p.image.replace(/\.webp$/, '-800.webp'))}
+                  src={coverSmall(p.image)}
                   width="800"
                   height="500"
                   alt=""

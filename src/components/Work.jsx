@@ -1,15 +1,10 @@
-import { useState } from 'react';
-import { flushSync } from 'react-dom';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import { useLang } from '../i18n/LanguageProvider.jsx';
 import { useReveal } from '../hooks/useReveal.js';
-import { projects, CATEGORIES, coverSrc, coverSrcSet } from '../data/projects.js';
+import { projects, FEATURED_IDS, coverSrc, coverSrcSet } from '../data/projects.js';
+import ProjectIndex from './ProjectIndex.jsx';
 
-const FILTERS = ['all', ...CATEGORIES];
-
-function countFor(filter) {
-  return filter === 'all' ? projects.length : projects.filter((p) => p.category === filter).length;
-}
+const featured = FEATURED_IDS.map((id) => projects.find((p) => p.id === id)).filter(Boolean);
 
 function WorkCard({ project, index, isAr, visitLabel }) {
   const reveal = useReveal();
@@ -22,7 +17,6 @@ function WorkCard({ project, index, isAr, visitLabel }) {
       // of a rigid grid. The offset lives on the <li> and the reveal on the
       // link inside, so the two transforms never fight.
       className="md:even:translate-y-28"
-      style={{ viewTransitionName: `work-${project.id}` }}
     >
       <a
         ref={reveal}
@@ -69,7 +63,7 @@ function WorkCard({ project, index, isAr, visitLabel }) {
         <p className="mt-3 max-w-[54ch] text-pretty text-[0.95rem] leading-relaxed text-muted">
           {description}
         </p>
-        <p className="mt-3 text-xs tracking-wide text-faint rtl:text-right" dir="ltr">
+        <p className="mt-3 font-mono text-xs text-faint rtl:text-right" dir="ltr">
           {project.tech.join(', ')}
         </p>
       </a>
@@ -80,72 +74,23 @@ function WorkCard({ project, index, isAr, visitLabel }) {
 export default function Work() {
   const { t, lang } = useLang();
   const isAr = lang === 'ar';
-  const [filter, setFilter] = useState('all');
   const headerReveal = useReveal();
-
-  const visible = filter === 'all' ? projects : projects.filter((p) => p.category === filter);
-
-  // View Transitions morph each card from its old grid slot to its new one.
-  // Browsers without the API (and reduced-motion visitors) switch instantly.
-  const choose = (next) => {
-    if (next === filter) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!document.startViewTransition || reduce) {
-      setFilter(next);
-      return;
-    }
-    document.startViewTransition(() => {
-      flushSync(() => setFilter(next));
-    });
-  };
 
   return (
     <section id="work" aria-labelledby="work-title" className="relative scroll-mt-24 py-28 md:py-40">
       <div className="shell">
-        <div ref={headerReveal} data-reveal className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h2
-              id="work-title"
-              className="font-display text-[clamp(2.4rem,5vw,4.5rem)] font-semibold leading-[1.02] tracking-display text-ink"
-            >
-              {t('work.title')}
-            </h2>
-            <p className="mt-5 max-w-[48ch] text-pretty text-lg leading-relaxed text-muted">
-              {t('work.lead')}
-            </p>
-          </div>
-
-          <div
-            role="group"
-            aria-label={t('work.filter')}
-            className="-mx-1 flex flex-wrap gap-2"
+        <div ref={headerReveal} data-reveal>
+          <h2
+            id="work-title"
+            className="font-display text-[clamp(2.4rem,5vw,4.5rem)] font-semibold leading-[1.02] tracking-display text-ink"
           >
-            {FILTERS.map((f) => {
-              const active = filter === f;
-              return (
-                <button
-                  key={f}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => choose(f)}
-                  className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-[background-color,border-color,color,transform] duration-200 ease-out active:scale-[0.97] ${
-                    active
-                      ? 'border-gold bg-gold-wash text-gold'
-                      : 'border-line text-muted can-hover:hover:border-line-strong can-hover:hover:text-ink'
-                  }`}
-                >
-                  {t(`work.filter.${f}`)}
-                  <span className={`tabular-nums text-xs ${active ? 'text-gold' : 'text-faint'}`}>
-                    {countFor(f)}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+            {t('work.title')}
+          </h2>
+          <p className="mt-5 max-w-[48ch] text-pretty text-lg leading-relaxed text-muted">{t('work.lead')}</p>
         </div>
 
-        <ul className="mt-16 grid gap-x-10 gap-y-20 md:mt-20 md:grid-cols-2 md:pb-28 lg:gap-x-14">
-          {visible.map((project, i) => (
+        <ul data-featured className="mt-16 grid gap-x-10 gap-y-20 md:mt-20 md:grid-cols-2 md:pb-28 lg:gap-x-14">
+          {featured.map((project, i) => (
             <WorkCard
               key={project.id}
               project={project}
@@ -155,6 +100,8 @@ export default function Work() {
             />
           ))}
         </ul>
+
+        <ProjectIndex />
       </div>
     </section>
   );

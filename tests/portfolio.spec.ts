@@ -34,7 +34,7 @@ test.describe('page shell', () => {
     const html = await res.text();
     expect(html).toContain('id="work"');
     expect(html).toContain('Selected work');
-    expect(html).toMatch(/rel="preload"[^>]+geist-latin/);
+    expect(html).toMatch(/rel="preload"[^>]+AbSansLatin/);
   });
 
   test('has no animated background layers and no canvas', async ({ page }) => {
@@ -78,11 +78,11 @@ test.describe('hero', () => {
   });
 });
 
-test.describe('work grid', () => {
-  test('lists every project as a link to its live site', async ({ page }) => {
+test.describe('work', () => {
+  test('features four projects as large cards linking to live sites', async ({ page }) => {
     await page.goto('/');
-    const cards = page.locator('#work ul > li');
-    await expect(cards).toHaveCount(PROJECT_COUNT);
+    const cards = page.locator('#work [data-featured] > li');
+    await expect(cards).toHaveCount(4);
 
     const first = cards.first().getByRole('link');
     await expect(first).toHaveAttribute('href', /^https:\/\//);
@@ -92,26 +92,51 @@ test.describe('work grid', () => {
 
   test('cards reveal once scrolled into view', async ({ page }) => {
     await page.goto('/');
-    const firstCard = page.locator('#work ul > li a').first();
+    const firstCard = page.locator('#work [data-featured] > li a').first();
     await firstCard.scrollIntoViewIfNeeded();
     await expect(firstCard).toHaveAttribute('data-in', '');
     await expect(firstCard).toHaveCSS('opacity', '1');
   });
 
-  test('filters narrow the grid and "All" restores it', async ({ page }) => {
+  test('the index lists every project as a link to its live site', async ({ page }) => {
+    await page.goto('/');
+    const rows = page.locator('#work [data-index] > li');
+    await expect(rows).toHaveCount(PROJECT_COUNT);
+
+    const first = rows.first().getByRole('link');
+    await expect(first).toHaveAttribute('href', /^https:\/\//);
+    await expect(first).toHaveAttribute('target', '_blank');
+    await expect(first).toHaveAttribute('rel', /noopener/);
+  });
+
+  test('filters narrow the index and "All" restores it', async ({ page }) => {
     await page.goto('/');
     const filters = page.getByRole('group', { name: /Filter projects/ });
-    const cards = page.locator('#work ul > li');
+    const rows = page.locator('#work [data-index] > li');
 
     await filters.getByRole('button', { name: /Clinics/ }).click();
-    await expect(cards).toHaveCount(2);
+    await expect(rows).toHaveCount(2);
     await expect(filters.getByRole('button', { name: /Clinics/ })).toHaveAttribute('aria-pressed', 'true');
 
     await filters.getByRole('button', { name: /Studios/ }).click();
-    await expect(cards).toHaveCount(4);
+    await expect(rows).toHaveCount(4);
 
     await filters.getByRole('button', { name: /^All/ }).click();
-    await expect(cards).toHaveCount(PROJECT_COUNT);
+    await expect(rows).toHaveCount(PROJECT_COUNT);
+  });
+
+  test('hovering an index row floats its cover beside the pointer', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'hover preview is for fine pointers only');
+    await page.goto('/');
+    const row = page.locator('#work [data-index] > li a').nth(2);
+    await row.scrollIntoViewIfNeeded();
+    const box = await row.boundingBox();
+    await page.mouse.move(box.x + 120, box.y + box.height / 2, { steps: 4 });
+
+    const cover = page.locator('#work img[src*="dr-galal-800"]').last();
+    await expect(cover).toHaveCSS('opacity', '1');
+    // The other rows dim so the hovered one leads.
+    await expect(page.locator('#work [data-index] > li a').first()).not.toHaveCSS('opacity', '1');
   });
 
   test('every cover image loads', async ({ page }) => {
@@ -123,6 +148,16 @@ test.describe('work grid', () => {
         .map((img) => img.currentSrc || img.src)
     );
     expect(broken).toEqual([]);
+  });
+});
+
+test.describe('about', () => {
+  test('states plain facts, with the live-site count taken from the data', async ({ page }) => {
+    await page.goto('/');
+    const facts = page.locator('#about dl');
+    await expect(facts.locator('dt')).toHaveCount(4);
+    await expect(facts).toContainText(`${PROJECT_COUNT}, and every one is open to visit`);
+    await expect(page.locator('.marquee')).toHaveCount(0);
   });
 });
 
